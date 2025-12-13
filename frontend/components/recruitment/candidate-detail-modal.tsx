@@ -34,14 +34,14 @@ export function CandidateDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[80vw] w-[80vw] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="!max-w-[95vw] !w-[95vw] max-h-[95vh] h-[95vh] overflow-y-auto p-8">
         {/* Back button */}
-        <Button variant="ghost" size="sm" onClick={onClose} className="absolute left-4 top-4 flex items-center gap-2">
+        <Button variant="ghost" size="sm" onClick={onClose} className="absolute left-8 top-8 flex items-center gap-2 z-10">
           <ArrowLeft className="h-4 w-4" />
           Back to candidates
         </Button>
 
-        <DialogHeader className="mt-8">
+        <DialogHeader className="mt-8 pr-8">
           {/* Candidate header with match score */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
@@ -64,15 +64,15 @@ export function CandidateDetailModal({
           </div>
 
           {/* Professional summary */}
-          <p className="text-sm text-muted-foreground leading-relaxed">{professionalSummary}</p>
+          <p className="text-base text-muted-foreground leading-relaxed">{professionalSummary}</p>
         </DialogHeader>
 
-        <Separator className="my-6" />
+        <Separator className="my-8" />
 
         {/* Skills section */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-3">Skills</h3>
-          <div className="flex flex-wrap gap-2">
+        <div className="mb-8">
+          <h3 className="text-xl font-semibold mb-4">Skills</h3>
+          <div className="flex flex-wrap gap-3">
             {skills.map((skill) => (
               <SkillBadge
                 key={skill.skillName}
@@ -83,21 +83,27 @@ export function CandidateDetailModal({
           </div>
         </div>
 
-        <Separator className="my-6" />
+        <Separator className="my-8" />
 
         {/* Projects and GitHub signals grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <BuiltProjectsCard
-            projects={projects}
-            onViewProject={(projectId) => console.log("View project:", projectId)}
-          />
-          {githubMetrics && <GitHubSignalsCard githubMetrics={githubMetrics} />}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <div className="min-w-0">
+            <BuiltProjectsCard
+              projects={projects}
+              onViewProject={(projectId) => console.log("View project:", projectId)}
+            />
+          </div>
+          {githubMetrics && (
+            <div className="min-w-0">
+              <GitHubSignalsCard githubMetrics={githubMetrics} />
+            </div>
+          )}
         </div>
 
-        <Separator className="my-6" />
+        <Separator className="my-8" />
 
         {/* Action buttons */}
-        <div className="flex gap-3">
+        <div className="flex gap-4 pt-4">
           <Button
             className="flex-1 bg-info hover:bg-info/90 text-info-foreground"
             onClick={() => onMoveToInterview?.(basicInfo.candidateId)}

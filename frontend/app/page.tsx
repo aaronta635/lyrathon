@@ -1,12 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { Calendar } from "lucide-react"
+import { Calendar, Search } from "lucide-react"
 import { JobPostingHeader } from "@/components/recruitment/job-posting-header"
 import { DashboardHeader } from "@/components/recruitment/dashboard-header"
 import { SearchFilterBar } from "@/components/recruitment/search-filter-bar"
 import { CandidateCard } from "@/components/recruitment/candidate-card"
 import { CandidateDetailModal } from "@/components/recruitment/candidate-detail-modal"
+import { Input } from "@/components/ui/input"
 import type { JobPostingInfo, DashboardMetrics, CandidateFullProfile } from "@/lib/types"
 
 // Mock data for demonstration
@@ -195,9 +196,11 @@ export default function RecruitmentDashboard() {
               <p className="text-sm text-muted-foreground">Candidate Management System</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Calendar className="h-4 w-4" />
-            <span>December 13, 2025</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Calendar className="h-4 w-4" />
+              <span>December 13, 2025</span>
+            </div>
           </div>
         </div>
       </header>
@@ -214,15 +217,33 @@ export default function RecruitmentDashboard() {
         <h2 className="text-2xl font-bold text-foreground mb-6">4 Applicants</h2>
 
         {/* Search and filters */}
-        <SearchFilterBar
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          selectedRole={selectedRole}
-          onRoleChange={setSelectedRole}
-          selectedSkillFilter={selectedSkillFilter}
-          onSkillFilterChange={setSelectedSkillFilter}
-          onAdvancedFiltersClick={() => console.log("Advanced filters clicked")}
-        />
+        <div className="mb-6">
+          <SearchFilterBar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            selectedRole={selectedRole}
+            onRoleChange={setSelectedRole}
+            selectedSkillFilter={selectedSkillFilter}
+            onSkillFilterChange={setSelectedSkillFilter}
+            onAdvancedFiltersClick={() => console.log("Advanced filters clicked")}
+          />
+          {/* Search other positions */}
+          <div className="mt-4 flex items-center gap-3">
+            <span className="text-sm text-muted-foreground">Search other positions:</span>
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search positions by title, location, or skills..."
+                className="pl-10"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    console.log("Searching other positions:", e.currentTarget.value)
+                  }
+                }}
+              />
+            </div>
+          </div>
+        </div>
 
         {/* Candidate cards grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
