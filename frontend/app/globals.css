@@ -1,118 +1,111 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Custom scrollbar for webkit browsers */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #86efac;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #4ade80;
-}
-
-/* Smooth transitions */
-* {
-  transition: colors 0.2s ease;
-}
-
-/* Focus styles for accessibility */
-button:focus-visible,
-input:focus-visible,
-select:focus-visible {
-  outline: 2px solid #86efac;
-  outline-offset: 2px;
-}
-
-/* Print styles */
-@media print {
-  .no-print {
-    display: none !important;
-  }
-}
+@custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Updated to soft mint green theme inspired by mobile interface */
-  --background: #f0f9f4;
-  --foreground: #1f2937;
+  /* Base colors */
+  --background: #ffffff;
+  --foreground: #001f3d;
+
+  /* Card colors */
   --card: #ffffff;
-  --card-foreground: #1f2937;
+  --card-foreground: #001f3d;
+
+  /* Popover colors */
   --popover: #ffffff;
-  --popover-foreground: #1f2937;
-  --primary: #86efac;
-  --primary-foreground: #1f2937;
-  --secondary: #bbf7d0;
-  --secondary-foreground: #1f2937;
-  --muted: #f0f9f4;
+  --popover-foreground: #001f3d;
+
+  /* Primary - Orange theme */
+  --primary: #ed985f;
+  --primary-foreground: #ffffff;
+
+  /* Secondary - Light orange */
+  --secondary: #f7b980;
+  --secondary-foreground: #001f3d;
+
+  /* Muted - Light gray */
+  --muted: #f5f5f5;
   --muted-foreground: #6b7280;
-  --accent: #4ade80;
+
+  /* Accent - Orange */
+  --accent: #ed985f;
   --accent-foreground: #ffffff;
+
+  /* Status colors */
+  --success: #10b981;
+  --success-foreground: #ffffff;
+
+  --warning: #f59e0b;
+  --warning-foreground: #ffffff;
+
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: #d1fae5;
-  --input: #ffffff;
-  --ring: #86efac;
-  --chart-1: #86efac;
-  --chart-2: #4ade80;
-  --chart-3: #bbf7d0;
-  --chart-4: #22c55e;
-  --chart-5: #16a34a;
-  --radius: 1rem;
-  --sidebar: #f0f9f4;
-  --sidebar-foreground: #1f2937;
-  --sidebar-primary: #86efac;
-  --sidebar-primary-foreground: #1f2937;
-  --sidebar-accent: #4ade80;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #d1fae5;
-  --sidebar-ring: #86efac;
+
+  --info: #3b82f6;
+  --info-foreground: #ffffff;
+
+  /* Border and input */
+  --border: #e6e6e6;
+  --input: #e6e6e6;
+  --ring: #ed985f;
+
+  /* Chart colors - Orange palette variations */
+  --chart-1: #ed985f;
+  --chart-2: #f7b980;
+  --chart-3: #001f3d;
+  --chart-4: #10b981;
+  --chart-5: #3b82f6;
+
+  --radius: 0.5rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
 }
 
 .dark {
-  /* Updated dark mode with green theme */
-  --background: #0f172a;
-  --foreground: #f1f5f9;
-  --card: #1e293b;
-  --card-foreground: #f1f5f9;
-  --popover: #1e293b;
-  --popover-foreground: #f1f5f9;
-  --primary: #86efac;
-  --primary-foreground: #0f172a;
-  --secondary: #22c55e;
-  --secondary-foreground: #f1f5f9;
-  --muted: #334155;
-  --muted-foreground: #94a3b8;
-  --accent: #4ade80;
-  --accent-foreground: #0f172a;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --border: #334155;
-  --input: #1e293b;
-  --ring: #86efac;
-  --chart-1: #86efac;
-  --chart-2: #4ade80;
-  --chart-3: #22c55e;
-  --chart-4: #16a34a;
-  --chart-5: #15803d;
-  --sidebar: #1e293b;
-  --sidebar-foreground: #f1f5f9;
-  --sidebar-primary: #86efac;
-  --sidebar-primary-foreground: #0f172a;
-  --sidebar-accent: #4ade80;
-  --sidebar-accent-foreground: #0f172a;
-  --sidebar-border: #334155;
-  --sidebar-ring: #86efac;
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
 }
 
 @theme inline {
+  --font-sans: "Geist", "Geist Fallback";
+  --font-mono: "Geist Mono", "Geist Mono Fallback";
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -127,8 +120,14 @@ select:focus-visible {
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -149,10 +148,6 @@ select:focus-visible {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-
-  /* Added Google Fonts for playful typography */
-  --font-sans: "Source Sans Pro", system-ui, sans-serif;
-  --font-serif: "Playfair Display", Georgia, serif;
 }
 
 @layer base {
@@ -160,16 +155,6 @@ select:focus-visible {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground font-sans;
-  }
-
-  /* Added playful heading styles */
-  h1,
-  h2,
-  h3 {
-    @apply font-serif font-bold;
+    @apply bg-background text-foreground;
   }
 }
-
-/* Added Google Fonts import */
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+Pro:wght@300;400;600&display=swap");
