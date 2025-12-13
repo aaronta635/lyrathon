@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Calendar, Search } from "lucide-react"
-import { JobPostingHeader } from "@/components/recruitment/job-posting-header"
+import { JobBlock } from "@/components/recruitment/job-block"
 import { DashboardHeader } from "@/components/recruitment/dashboard-header"
 import { SearchFilterBar } from "@/components/recruitment/search-filter-bar"
 import { CandidateCard } from "@/components/recruitment/candidate-card"
@@ -207,8 +207,8 @@ export default function RecruitmentDashboard() {
 
       {/* Main content */}
       <main className="container mx-auto px-6 py-8">
-        {/* Job posting header */}
-        <JobPostingHeader jobInfo={mockJobInfo} />
+        {/* Job posting block */}
+        <JobBlock jobInfo={mockJobInfo} />
 
         {/* Dashboard metrics */}
         <DashboardHeader metrics={mockMetrics} />
