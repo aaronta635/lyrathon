@@ -114,11 +114,12 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Added custom color palette for applicant page */
-  --color-navy-blue: #001f3d;
-  --color-peach-orange: #ed985f;
-  --color-light-peach: #f7b980;
-  --color-light-gray: #e6e6e6;
+  /* Updated to Workable-inspired green color palette */
+  --color-cyprus: #004038;
+  --color-pine-green: #00756a;
+  --color-foam: #f6fefb;
+  --color-teal-light: #e0f5f3;
+  --color-gray-neutral: #e6e6e6;
 }
 
 @layer base {

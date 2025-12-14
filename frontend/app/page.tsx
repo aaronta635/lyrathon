@@ -1,206 +1,155 @@
-"use client"
+import Link from "next/link"
+import { ArrowRight, Users, FileText, Sparkles, Clock, Shield } from "lucide-react"
+import NavigationHeader from "@/components/navigation_header"
 
-import { useState, useEffect } from "react"
-import { Calendar } from "lucide-react"
-import { JobBlock } from "@/components/recruitment/job-block"
-import { CandidateCard } from "@/components/recruitment/candidate-card"
-import { CandidateDetailModal } from "@/components/recruitment/candidate-detail-modal"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import type { JobPostingInfo, DashboardMetrics, CandidateFullProfile } from "@/lib/types"
-import { getJobs, getDashboardMetrics, getCandidates, getCandidateProfile } from "@/lib/api/recruitment"
-import type { CandidateListItem } from "@/lib/api/mock-data"
-
-export default function RecruitmentDashboard() {
-  const [jobs, setJobs] = useState<JobPostingInfo[]>([])
-  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null)
-  const [candidates, setCandidates] = useState<CandidateListItem[]>([])
-  const [selectedCandidateProfile, setSelectedCandidateProfile] = useState<CandidateFullProfile | null>(null)
-  const [selectedJobId, setSelectedJobId] = useState("job-001")
-  const [jobOverrides, setJobOverrides] = useState<Partial<JobPostingInfo>>({})
-  const [sortBy, setSortBy] = useState("score-desc")
-  const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null)
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
-
-  // Fetch data on mount
-  useEffect(() => {
-    getJobs().then(setJobs)
-    getDashboardMetrics().then(setMetrics)
-    getCandidates().then(setCandidates)
-  }, [])
-
-  // Fetch candidate profile when selected
-  useEffect(() => {
-    if (selectedCandidateId) {
-      getCandidateProfile(selectedCandidateId).then(setSelectedCandidateProfile)
-    } else {
-      setSelectedCandidateProfile(null)
-    }
-  }, [selectedCandidateId])
-
-  const allJobsDefault: JobPostingInfo = {
-    jobId: "all",
-    jobTitle: "All Positions",
-    location: "All Locations",
-    employmentType: "all" as JobPostingInfo["employmentType"],
-    salaryRange: { minSalary: 0, maxSalary: 999999, currency: "AUD" },
-    requiredSkills: [],
-  }
-  const baseJob = selectedJobId === "all" ? allJobsDefault : (jobs.find((job) => job.jobId === selectedJobId) || jobs[0] || allJobsDefault)
-  const currentJob = baseJob ? { ...baseJob, ...jobOverrides } : allJobsDefault
-  
-  const handleJobInfoUpdate = (updates: Partial<JobPostingInfo>) => {
-    setJobOverrides(prev => ({ ...prev, ...updates }))
-  }
-  
-  // Filter candidates by location and skill match, then sort
-  const filteredAndSortedCandidates = candidates
-    .filter(candidate => {
-      // Location filter: "All Locations" shows everyone, otherwise match job location or Remote
-      const jobLocation = currentJob.location
-      const candidateLocation = candidate.candidateInfo.location.split(",")[0].trim()
-      const locationMatch = jobLocation === "All Locations" || jobLocation === "Remote" || candidateLocation === jobLocation || candidateLocation === "Remote"
-      
-      // Skill match: if no skills required or candidate has at least one required skill
-      const hasSkillMatch = currentJob.requiredSkills.length === 0 || currentJob.requiredSkills.some(skill => 
-        candidate.topSkills.some(s => s.toLowerCase().includes(skill.toLowerCase()))
-      )
-      
-      return locationMatch && hasSkillMatch
-    })
-    .map(candidate => {
-      // Recalculate match score based on skill overlap
-      const skillOverlap = currentJob.requiredSkills.length > 0 
-        ? currentJob.requiredSkills.filter(skill =>
-            candidate.topSkills.some(s => s.toLowerCase().includes(skill.toLowerCase()))
-          ).length
-        : candidate.topSkills.length
-      const skillMatchPercent = currentJob.requiredSkills.length > 0
-        ? Math.round((skillOverlap / currentJob.requiredSkills.length) * 100)
-        : 100
-      
-      return {
-        ...candidate,
-        dynamicScore: Math.round((candidate.matchScore.overallScore + skillMatchPercent) / 2)
-      }
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case "score-desc":
-          return b.dynamicScore - a.dynamicScore
-        case "score-asc":
-          return a.dynamicScore - b.dynamicScore
-        case "exp-desc":
-          return b.candidateInfo.yearsOfExperience - a.candidateInfo.yearsOfExperience
-        case "exp-asc":
-          return a.candidateInfo.yearsOfExperience - b.candidateInfo.yearsOfExperience
-        default:
-          return 0
-      }
-    })
-
-  const handleCandidateClick = (candidateId: string) => {
-    setSelectedCandidateId(candidateId)
-    setIsDetailModalOpen(true)
-  }
-
-  const handleCloseModal = () => {
-    setIsDetailModalOpen(false)
-    setSelectedCandidateId(null)
-  }
-
+export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Header with logo and date */}
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary rounded-lg">
-              <svg className="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-foreground">Talent Pipeline</h1>
-              <p className="text-sm text-muted-foreground">Candidate Management System</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4" />
-              <span>December 13, 2025</span>
+      <NavigationHeader currentMode="home" />
+
+      {/* Header */}
+      <header className="border-b border-border bg-navy">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-orange flex items-center justify-center">
+                <Sparkles className="h-5 w-5 text-navy" />
+              </div>
+              <span className="text-xl font-bold text-white">HireFlow</span>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main content */}
-      <main className="container mx-auto px-6 py-8">
-        {/* Job posting block with inline metrics */}
-        {metrics && (
-          <JobBlock 
-            jobInfo={currentJob}
-            metrics={metrics}
-            allJobs={jobs.map((j) => ({ jobId: j.jobId, jobTitle: j.jobTitle }))}
-            onJobChange={(jobId) => {
-              setSelectedJobId(jobId)
-              setJobOverrides({}) // Reset overrides when changing jobs
-            }}
-            onJobInfoUpdate={handleJobInfoUpdate}
-          />
-        )}
+      {/* Hero Section */}
+      <section className="bg-gradient-to-b from-navy to-navy/95 text-white py-20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 text-balance">Automate Your Hiring Process</h1>
+            <p className="text-xl md:text-2xl text-peach mb-12 text-pretty">
+              Streamline recruitment and applications with our intelligent platform. Save time, reduce complexity, and
+              make hiring easier for everyone.
+            </p>
 
-        {/* Section title + sort */}
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-foreground">{filteredAndSortedCandidates.length} Applicants</h2>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Sort:</span>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[160px] h-8 text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="score-desc">Match Score ↓</SelectItem>
-                <SelectItem value="score-asc">Match Score ↑</SelectItem>
-                <SelectItem value="exp-desc">Experience ↓</SelectItem>
-                <SelectItem value="exp-asc">Experience ↑</SelectItem>
-              </SelectContent>
-            </Select>
+            {/* Mode Selection Cards */}
+            <div className="grid md:grid-cols-2 gap-6 mt-12">
+              {/* Applicant Card */}
+              <Link href="/applicant/page_1">
+                <div className="group bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 hover:bg-white/15 hover:scale-105 transition-all duration-300 cursor-pointer">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="h-16 w-16 rounded-full bg-orange flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <FileText className="h-8 w-8 text-navy" />
+                    </div>
+                    <h2 className="text-2xl font-bold">I'm an Applicant</h2>
+                    <p className="text-gray-light text-balance">
+                      Submit your application with ease. Upload your resume, showcase projects, and verify your email.
+                    </p>
+                    <div className="flex items-center gap-2 text-orange font-semibold group-hover:gap-3 transition-all">
+                      Start Application <ArrowRight className="h-5 w-5" />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+
+              {/* Recruiter Card */}
+              <Link href="/recruiter/dashboard">
+                <div className="group bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 hover:bg-white/15 hover:scale-105 transition-all duration-300 cursor-pointer">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="h-16 w-16 rounded-full bg-peach flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <Users className="h-8 w-8 text-navy" />
+                    </div>
+                    <h2 className="text-2xl font-bold">I'm a Recruiter</h2>
+                    <p className="text-gray-light text-balance">
+                      Manage applications, review candidates, and streamline your hiring workflow efficiently.
+                    </p>
+                    <div className="flex items-center gap-2 text-peach font-semibold group-hover:gap-3 transition-all">
+                      Access Dashboard <ArrowRight className="h-5 w-5" />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
           </div>
         </div>
+      </section>
 
-        {/* Candidate cards grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {filteredAndSortedCandidates.map((candidate) => (
-            <CandidateCard
-              key={candidate.candidateInfo.candidateId}
-              candidateInfo={candidate.candidateInfo}
-              matchScore={{ ...candidate.matchScore, overallScore: candidate.dynamicScore }}
-              topSkills={candidate.topSkills}
-              engineeringType={candidate.engineeringType}
-              onCardClick={handleCandidateClick}
-            />
-          ))}
+      {/* Features Section */}
+      <section className="py-20 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-4xl font-bold text-center mb-4 text-navy">Why Choose HireFlow?</h2>
+            <p className="text-center text-muted-foreground mb-12 text-lg">
+              Built to make hiring seamless for both recruiters and applicants
+            </p>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* Feature 1 */}
+              <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-shadow">
+                <div className="h-12 w-12 rounded-lg bg-orange/10 flex items-center justify-center mb-4">
+                  <Clock className="h-6 w-6 text-orange" />
+                </div>
+                <h3 className="text-xl font-bold mb-2 text-navy">Save Time</h3>
+                <p className="text-muted-foreground">
+                  Automated workflows reduce manual work by up to 70%, letting you focus on what matters most.
+                </p>
+              </div>
+
+              {/* Feature 2 */}
+              <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-shadow">
+                <div className="h-12 w-12 rounded-lg bg-peach/20 flex items-center justify-center mb-4">
+                  <Shield className="h-6 w-6 text-orange" />
+                </div>
+                <h3 className="text-xl font-bold mb-2 text-navy">Secure & Reliable</h3>
+                <p className="text-muted-foreground">
+                  Email verification and secure data handling ensure every application is legitimate and protected.
+                </p>
+              </div>
+
+              {/* Feature 3 */}
+              <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-shadow">
+                <div className="h-12 w-12 rounded-lg bg-orange/10 flex items-center justify-center mb-4">
+                  <Sparkles className="h-6 w-6 text-orange" />
+                </div>
+                <h3 className="text-xl font-bold mb-2 text-navy">Smart Processing</h3>
+                <p className="text-muted-foreground">
+                  Intelligent forms collect all necessary information in a structured, easy-to-review format.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-      </main>
+      </section>
 
-      {/* Candidate detail modal */}
-      <CandidateDetailModal
-        isOpen={isDetailModalOpen}
-        onClose={handleCloseModal}
-        candidateProfile={selectedCandidateProfile}
-        onMoveToInterview={(id) => console.log("Move to interview:", id)}
-        onReject={(id) => console.log("Reject candidate:", id)}
-        onViewResume={(url) => console.log("View resume:", url)}
-      />
+      {/* CTA Section */}
+      <section className="py-16 bg-navy text-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-balance">Ready to Transform Your Hiring?</h2>
+            <p className="text-xl text-peach mb-8">Join hundreds of organizations making hiring simpler and faster</p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/applicant/page_1">
+                <button className="bg-orange hover:bg-orange/90 text-navy px-8 py-3 rounded-lg font-semibold transition-colors">
+                  Apply Now
+                </button>
+              </Link>
+              <Link href="/recruiter/dashboard">
+                <button className="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+                  Recruiter Access
+                </button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-8 border-t border-border bg-background">
+        <div className="container mx-auto px-4">
+          <div className="text-center text-muted-foreground">
+            <p>© 2025 HireFlow. Making hiring easier for everyone.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

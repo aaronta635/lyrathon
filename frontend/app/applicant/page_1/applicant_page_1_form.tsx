@@ -6,6 +6,7 @@ import { useState } from "react"
 import { ApplicantPage1PdfUpload } from "./applicant_page_1_pdf_upload"
 import { ApplicantPage1GithubProjects } from "./applicant_page_1_github_projects"
 import { ApplicantPage1PersonalInfo } from "./applicant_page_1_personal_info"
+import { ApplicantPage1JobArea } from "./applicant_page_1_job_area"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowRight } from "lucide-react"
@@ -16,6 +17,7 @@ export interface ApplicantFormData {
   phoneNumber: string
   resumeFile: File | null
   githubProjectUrls: string[]
+  jobArea: string
 }
 
 export function ApplicantPage1Form() {
@@ -25,6 +27,7 @@ export function ApplicantPage1Form() {
     phoneNumber: "",
     resumeFile: null,
     githubProjectUrls: [""],
+    jobArea: "",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formErrors, setFormErrors] = useState<Record<string, string>>({})
@@ -35,6 +38,17 @@ export function ApplicantPage1Form() {
       setFormErrors((prev) => {
         const newErrors = { ...prev }
         delete newErrors[field]
+        return newErrors
+      })
+    }
+  }
+
+  const handleJobAreaChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, jobArea: value }))
+    if (formErrors.jobArea) {
+      setFormErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors.jobArea
         return newErrors
       })
     }
@@ -79,6 +93,10 @@ export function ApplicantPage1Form() {
       errors.phoneNumber = "Phone number is required"
     }
 
+    if (!formData.jobArea) {
+      errors.jobArea = "Please select a job area"
+    }
+
     if (!formData.resumeFile) {
       errors.resumeFile = "Please upload your resume"
     }
@@ -118,6 +136,7 @@ export function ApplicantPage1Form() {
       phoneNumber: "",
       resumeFile: null,
       githubProjectUrls: [""],
+      jobArea: "",
     })
     setFormErrors({})
   }
@@ -137,6 +156,20 @@ export function ApplicantPage1Form() {
               phoneNumber={formData.phoneNumber}
               onChange={handlePersonalInfoChange}
               errors={formErrors}
+            />
+          </CardContent>
+        </Card>
+
+        <Card className="border-2 shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader>
+            <CardTitle className="text-navy-blue">Job Area</CardTitle>
+            <CardDescription>What type of position are you looking for?</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ApplicantPage1JobArea
+              selectedJobArea={formData.jobArea}
+              onChange={handleJobAreaChange}
+              error={formErrors.jobArea}
             />
           </CardContent>
         </Card>
@@ -181,6 +214,7 @@ export function ApplicantPage1Form() {
                 phoneNumber: "",
                 resumeFile: null,
                 githubProjectUrls: [""],
+                jobArea: "",
               })
               setFormErrors({})
             }}

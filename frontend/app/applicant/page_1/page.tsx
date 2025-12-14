@@ -1,10 +1,10 @@
 import { ApplicantPage1Form } from "./applicant_page_1_form"
-import { ApplicantPage1Header } from "./applicant_page_1_header"
+import NavigationHeader from "@/components/navigation_header"
 
 export default function ApplicantPage1() {
   return (
     <div className="min-h-screen bg-background">
-      <ApplicantPage1Header />
+      <NavigationHeader currentMode="applicant" />
       <main className="container mx-auto px-4 py-12 max-w-3xl">
         <div className="space-y-6">
           <div className="text-center space-y-2">
