@@ -18,9 +18,9 @@ interface JobTitleProps {
 
 export function JobTitle({ selectedJobId, jobs, onJobChange, className = "" }: JobTitleProps) {
   return (
-    <div className={`mb-3 ${className}`}>
+    <div className={className}>
       <Select value={selectedJobId} onValueChange={onJobChange}>
-        <SelectTrigger className="w-auto border-none shadow-none p-0 h-auto text-4xl font-bold text-foreground hover:text-foreground/80 transition-colors [&>svg]:h-8 [&>svg]:w-8 [&>svg]:ml-2">
+        <SelectTrigger className="w-auto border-none shadow-none p-0 h-auto text-3xl font-bold text-foreground hover:text-primary transition-colors [&>svg]:h-6 [&>svg]:w-6 [&>svg]:ml-2 [&>svg]:text-secondary">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

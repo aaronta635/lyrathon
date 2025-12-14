@@ -1,7 +1,6 @@
 "use client"
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { User, Briefcase, Sparkles, Users, Wrench } from "lucide-react"
 
 interface EngineerSummary {
   inferred_seniority: string
@@ -15,48 +14,37 @@ interface PersonalityCardProps {
 }
 
 export function PersonalityCard({ summary }: PersonalityCardProps) {
+  const traits = [
+    { icon: "👔", label: "Seniority", value: summary.inferred_seniority, color: "bg-primary/10" },
+    { icon: "⭐", label: "Strengths", value: summary.core_strengths.join(", ") || "None identified", color: "bg-accent/10" },
+    { icon: "🎯", label: "Working Style", value: summary.working_style, color: "bg-secondary/10" },
+    { icon: "🤝", label: "Collaboration", value: summary.collaboration_style, color: "bg-warning/10" },
+  ]
+
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <User className="h-5 w-5 text-primary" />
+    <Card 
+      className="h-full border-0 rounded-xl overflow-hidden"
+      style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.08)' }}
+    >
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-base font-semibold">
+          <span>🧠</span>
           Personality
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <div className="flex items-start gap-3">
-          <Briefcase className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-          <div>
-            <p className="text-xs text-muted-foreground uppercase tracking-wide">Seniority</p>
-            <p className="text-sm text-foreground capitalize">{summary.inferred_seniority}</p>
+        {traits.map((trait, index) => (
+          <div key={index} className="flex items-start gap-3">
+            <div className={`w-10 h-10 rounded-xl ${trait.color} flex items-center justify-center text-lg shrink-0`}>
+              {trait.icon}
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">{trait.label}</p>
+              <p className="text-sm text-foreground font-medium capitalize truncate">{trait.value}</p>
+            </div>
           </div>
-        </div>
-
-        <div className="flex items-start gap-3">
-          <Sparkles className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-          <div>
-            <p className="text-xs text-muted-foreground uppercase tracking-wide">Core Strengths</p>
-            <p className="text-sm text-foreground">{summary.core_strengths.join(", ") || "None identified"}</p>
-          </div>
-        </div>
-
-        <div className="flex items-start gap-3">
-          <Wrench className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-          <div>
-            <p className="text-xs text-muted-foreground uppercase tracking-wide">Working Style</p>
-            <p className="text-sm text-foreground capitalize">{summary.working_style}</p>
-          </div>
-        </div>
-
-        <div className="flex items-start gap-3">
-          <Users className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-          <div>
-            <p className="text-xs text-muted-foreground uppercase tracking-wide">Collaboration</p>
-            <p className="text-sm text-foreground capitalize">{summary.collaboration_style}</p>
-          </div>
-        </div>
+        ))}
       </CardContent>
     </Card>
   )
 }
-

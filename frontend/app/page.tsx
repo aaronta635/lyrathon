@@ -376,16 +376,30 @@ export default function RecruitmentDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header with logo and date - Workable style */}
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Organic blob shapes - teal only */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full" style={{ background: 'radial-gradient(circle, rgba(78, 205, 196, 0.12) 0%, transparent 70%)' }} />
+        <div className="absolute top-1/3 -left-24 w-72 h-72 rounded-full" style={{ background: 'radial-gradient(circle, rgba(60, 141, 147, 0.08) 0%, transparent 70%)' }} />
+        <div className="absolute bottom-20 right-1/4 w-64 h-64 rounded-full" style={{ background: 'radial-gradient(circle, rgba(69, 183, 175, 0.1) 0%, transparent 70%)' }} />
+        <div className="absolute top-1/2 right-10 w-16 h-16 rounded-full bg-accent/10" />
+        <div className="absolute bottom-40 left-20 w-12 h-12 rounded-full bg-secondary/10" />
+      </div>
+
+      {/* Header with marble texture background */}
       <header 
-        className="bg-card border-0"
-        style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)' }}
+        className="relative z-10"
+        style={{ 
+          backgroundImage: `linear-gradient(90deg, rgba(26,90,82,0.3) 0%, rgba(0,0,0,0.2) 100%), url('/textures/marble-teal.jpg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: '20% center',
+        }}
       >
-        <div className="container mx-auto px-8 py-5 flex items-center justify-between">
+        <div className="container mx-auto pl-8 pr-8 py-5 flex items-center justify-between">
+          {/* Left: Logo and brand */}
           <div className="flex items-center gap-4">
-            <div className="p-2.5 bg-primary rounded">
-              <svg className="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <div className="p-2.5 bg-white/15 rounded-xl backdrop-blur-sm" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+              <svg className="h-6 w-6 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                 <circle cx="9" cy="7" r="4" />
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -393,14 +407,31 @@ export default function RecruitmentDashboard() {
               </svg>
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-foreground">Talent Pipeline</h1>
-              <p className="text-sm text-muted-foreground">Candidate Management System</p>
+              <h1 className="text-xl font-semibold text-white" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>Talent Pipeline</h1>
+              <p className="text-sm text-white/80" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>Candidate Management System</p>
             </div>
           </div>
+          
+          {/* Right: Navigation and actions */}
           <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4" />
-              <span>December 14, 2025</span>
+            <nav className="flex items-center gap-4">
+              <a href="#" className="text-sm font-medium text-white/90 hover:text-white transition-colors" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>Dashboard</a>
+              <a href="#" className="text-sm font-medium text-white/90 hover:text-white transition-colors" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>Jobs</a>
+              <a href="#" className="text-sm font-medium text-white/90 hover:text-white transition-colors" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>Candidates</a>
+            </nav>
+            <div className="flex items-center gap-4 pl-4 border-l border-white/20">
+              <button className="text-white/80 hover:text-white transition-colors">
+                <svg className="h-5 w-5 drop-shadow-md" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+              </button>
+              <div className="flex items-center gap-2 text-sm text-white/80" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>
+                <Calendar className="h-4 w-4 drop-shadow-md" />
+                <span>Dec 14, 2025</span>
+              </div>
+              <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white font-semibold text-sm" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>
+                RS
+              </div>
             </div>
           </div>
         </div>

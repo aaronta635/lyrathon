@@ -81,7 +81,7 @@ export function JobDetails({
       {/* Location, Employment Type, Salary as dropdowns */}
       <div className="flex items-center gap-3 text-sm mb-4">
         <Select value={location} onValueChange={onLocationChange}>
-          <SelectTrigger className="w-auto h-8 border-none shadow-none p-0 text-primary hover:text-primary/80 font-medium [&>svg]:text-primary">
+          <SelectTrigger className="w-auto h-8 border-none shadow-none p-0 text-secondary hover:text-secondary/80 font-medium [&>svg]:text-secondary">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -94,7 +94,7 @@ export function JobDetails({
         <span className="text-muted-foreground">•</span>
 
         <Select value={employmentType} onValueChange={onEmploymentTypeChange}>
-          <SelectTrigger className="w-auto h-8 border-none shadow-none p-0 text-primary hover:text-primary/80 font-medium [&>svg]:text-primary">
+          <SelectTrigger className="w-auto h-8 border-none shadow-none p-0 text-secondary hover:text-secondary/80 font-medium [&>svg]:text-secondary">
             <SelectValue>
               {employmentTypeOptions.find(t => t.value === employmentType)?.label || employmentType}
             </SelectValue>
@@ -115,7 +115,7 @@ export function JobDetails({
             onSalaryRangeChange?.({ minSalary: min, maxSalary: max, currency: "AUD" })
           }}
         >
-          <SelectTrigger className="w-auto h-8 border-none shadow-none p-0 text-primary hover:text-primary/80 font-medium [&>svg]:text-primary">
+          <SelectTrigger className="w-auto h-8 border-none shadow-none p-0 text-secondary hover:text-secondary/80 font-medium [&>svg]:text-secondary">
             <SelectValue>{formattedSalaryRange}</SelectValue>
           </SelectTrigger>
           <SelectContent>
@@ -158,15 +158,13 @@ export function JobDetails({
             </Button>
           </div>
         ) : (
-          <Button 
-            size="sm" 
-            variant="outline" 
-            className="h-8 text-xs gap-1.5 text-primary border-primary/30 hover:bg-primary/5 hover:text-primary font-medium"
+          <button 
+            className="flex items-center gap-1 text-sm font-semibold text-accent hover:text-accent/80 transition-colors"
             onClick={() => setIsAddingSkill(true)}
           >
-            <Plus className="h-3.5 w-3.5" />
+            <Plus className="h-4 w-4" />
             Add Skill
-          </Button>
+          </button>
         )}
       </div>
     </div>

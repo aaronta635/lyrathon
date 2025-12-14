@@ -16,7 +16,7 @@ interface CandidateDetailModalProps {
   isOpen: boolean
   onClose: () => void
   candidateProfile: CandidateFullProfile | null
-  jobRequiredSkills?: string[] // To determine matched vs unmatched skills
+  jobRequiredSkills?: string[]
   onMoveToInterview?: (candidateId: string) => void
   onReject?: (candidateId: string) => void
   onViewResume?: (resumeUrl: string) => void
@@ -35,9 +35,8 @@ export function CandidateDetailModal({
 
   const { basicInfo, matchScore, skills, projects, hiringRecommendation, engineerSummary, recommendations, resumeUrl } = candidateProfile
 
-  // Check if skill matches job requirements
   const isSkillMatched = (skillName: string) => {
-    if (jobRequiredSkills.length === 0) return true // If no job skills specified, all are "matched"
+    if (jobRequiredSkills.length === 0) return true
     return jobRequiredSkills.some(reqSkill => 
       skillName.toLowerCase().includes(reqSkill.toLowerCase()) ||
       reqSkill.toLowerCase().includes(skillName.toLowerCase())
@@ -46,27 +45,39 @@ export function CandidateDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="!max-w-[700px] !w-[700px] max-h-[90vh] overflow-y-auto p-8 border-0" style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.15)' }}>
-        {/* Back button - separate row */}
-        <div className="border-b border-border pb-4 mb-6">
-          <Button variant="ghost" size="sm" onClick={onClose} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground -ml-2">
+      <DialogContent 
+        className="!max-w-[720px] !w-[720px] max-h-[90vh] overflow-y-auto p-0 border-0 rounded-2xl bg-background"
+        style={{ boxShadow: '0 25px 50px rgba(0,0,0,0.2)' }}
+      >
+        {/* Header with marble texture */}
+        <div 
+          className="p-6 rounded-t-2xl"
+          style={{ 
+            backgroundImage: `linear-gradient(90deg, rgba(26,90,82,0.4) 0%, rgba(0,0,0,0.3) 100%), url('/textures/marble-teal.jpg')`,
+            backgroundSize: 'cover',
+            backgroundPosition: '20% center',
+          }}
+        >
+          <button 
+            onClick={onClose} 
+            className="flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors mb-4"
+          >
             <ArrowLeft className="h-4 w-4" />
             Back to candidates
-          </Button>
-        </div>
-
-        <DialogHeader className="sr-only">
-          <DialogTitle>{basicInfo.fullName}</DialogTitle>
-        </DialogHeader>
-
-        {/* Candidate info card */}
-        <Card className="mb-6 border-0" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)' }}>
-          <CardContent className="p-6">
-            {/* Header with name, location, experience and match score */}
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <h2 className="text-2xl font-semibold mb-2">{basicInfo.fullName}</h2>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          </button>
+          
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-4">
+              {/* Avatar placeholder */}
+              <div 
+                className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold text-white"
+                style={{ background: 'linear-gradient(135deg, #4ECDC4 0%, #45B7AF 100%)' }}
+              >
+                {basicInfo.fullName.split(' ').map(n => n[0]).join('')}
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-1">{basicInfo.fullName}</h2>
+                <div className="flex items-center gap-4 text-sm text-white/80">
                   <div className="flex items-center gap-1.5">
                     <MapPin className="h-4 w-4" />
                     <span>{basicInfo.location}</span>
@@ -75,28 +86,53 @@ export function CandidateDetailModal({
                     <Calendar className="h-4 w-4" />
                     <span>{basicInfo.yearsOfExperience}y exp</span>
                   </div>
-                  <button
-                    onClick={() => onViewResume?.(resumeUrl)}
-                    className="flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors font-medium"
-                  >
-                    <FileText className="h-4 w-4" />
-                    <span>View Resume</span>
-                  </button>
                 </div>
               </div>
-              <div className="flex flex-col items-end gap-2">
-                <MatchScoreDisplay scorePercentage={matchScore.overallScore} size="md" />
-                <FitLevelBadge fitLevel={matchScore.fitLevel} />
+            </div>
+            <div className="flex flex-col items-end gap-2">
+              <MatchScoreDisplay scorePercentage={matchScore.overallScore} size="md" />
+              <FitLevelBadge fitLevel={matchScore.fitLevel} />
+            </div>
+          </div>
+        </div>
+
+        <DialogHeader className="sr-only">
+          <DialogTitle>{basicInfo.fullName}</DialogTitle>
+        </DialogHeader>
+
+        {/* Content */}
+        <div className="p-6">
+          {/* Hiring Recommendation card */}
+          <Card 
+            className="mb-6 border-0 rounded-xl overflow-hidden"
+            style={{ 
+              boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+              borderLeft: '4px solid #45B7AF'
+            }}
+          >
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">💡</span>
+                <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Hiring Recommendation</h3>
               </div>
-            </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">{hiringRecommendation}</p>
+            </CardContent>
+          </Card>
 
-            {/* Hiring Recommendation (from GitHub analyzer) */}
-            <div className="mb-5">
-              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Hiring Recommendation</h3>
-              <p className="text-sm text-foreground leading-relaxed">{hiringRecommendation}</p>
-            </div>
+          {/* View Resume button */}
+          <button
+            onClick={() => onViewResume?.(resumeUrl)}
+            className="flex items-center gap-2 text-sm font-semibold text-secondary hover:text-secondary/80 transition-colors mb-6"
+          >
+            <FileText className="h-4 w-4" />
+            View Full Resume →
+          </button>
 
-            {/* Skills section - green = matched, gray = unmatched */}
+          {/* Skills */}
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+              <span>🛠️</span> Skills
+            </h3>
             <div className="flex flex-wrap gap-2">
               {skills.map((skill) => (
                 <SkillBadge
@@ -107,41 +143,47 @@ export function CandidateDetailModal({
                 />
               ))}
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Projects and Personality Analysis grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <BuiltProjectsCard
-            projects={projects}
-            onViewProject={(projectId) => console.log("View project:", projectId)}
-          />
-          {engineerSummary && (
-            <PersonalityCard summary={engineerSummary} />
-          )}
-        </div>
-
-        {/* Recommendations section */}
-        {recommendations && recommendations.length > 0 && (
-          <div className="mb-6">
-            <RecommendationsCard recommendations={recommendations} />
           </div>
-        )}
 
-        {/* Action buttons */}
-        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
-          <Button variant="outline" size="default" onClick={() => onReject?.(basicInfo.candidateId)} className="text-destructive border-destructive/30 hover:bg-destructive/5">
-            <XCircle className="h-4 w-4 mr-2" />
-            Reject Candidate
-          </Button>
-          <Button
-            size="default"
-            className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
-            onClick={() => onMoveToInterview?.(basicInfo.candidateId)}
-          >
-            <CheckCircle className="h-4 w-4 mr-2" />
-            Move to Interview
-          </Button>
+          {/* Projects and Personality grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
+            <BuiltProjectsCard
+              projects={projects}
+              onViewProject={(projectId) => console.log("View project:", projectId)}
+            />
+            {engineerSummary && (
+              <PersonalityCard summary={engineerSummary} />
+            )}
+          </div>
+
+          {/* Recommendations */}
+          {recommendations && recommendations.length > 0 && (
+            <div className="mb-6">
+              <RecommendationsCard recommendations={recommendations} />
+            </div>
+          )}
+
+          {/* Action buttons */}
+          <div className="grid grid-cols-2 gap-4 pt-5 border-t border-border">
+            <Button 
+              variant="outline" 
+              size="lg"
+              onClick={() => onReject?.(basicInfo.candidateId)} 
+              className="rounded-xl border-2 text-muted-foreground hover:text-destructive hover:border-destructive/30 hover:bg-destructive/5 transition-all"
+            >
+              <XCircle className="h-5 w-5 mr-2" />
+              Reject
+            </Button>
+            <Button
+              size="lg"
+              className="rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold transition-all hover:scale-[1.02]"
+              style={{ boxShadow: '0 4px 12px rgba(26, 90, 82, 0.3)' }}
+              onClick={() => onMoveToInterview?.(basicInfo.candidateId)}
+            >
+              <CheckCircle className="h-5 w-5 mr-2" />
+              Move to Interview
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
