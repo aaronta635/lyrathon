@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Calendar } from "lucide-react"
 import NavigationHeader from "@/components/navigation_header"
 import { JobBlock } from "@/components/recruitment/job-block"
@@ -14,8 +14,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import type { JobPostingInfo, DashboardMetrics, CandidateFullProfile } from "@/lib/types"
+import { getJobs, getDashboardMetrics, getCandidates, getCandidateProfile } from "@/lib/api/recruitment"
 
-// Mock data for demonstration
+// Mock data for demonstration (fallback)
 const mockJobs: JobPostingInfo[] = [
   {
     jobId: "job-001",
@@ -264,11 +265,51 @@ const mockFullProfile: CandidateFullProfile = {
 }
 
 export default function RecruiterDashboard() {
+  const [jobs, setJobs] = useState<JobPostingInfo[]>(mockJobs)
+  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null)
+  const [candidates, setCandidates] = useState<any[]>([])
   const [selectedJobId, setSelectedJobId] = useState("job-001")
   const [jobOverrides, setJobOverrides] = useState<Partial<JobPostingInfo>>({})
   const [sortBy, setSortBy] = useState("score-desc")
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null)
+  const [selectedCandidateProfile, setSelectedCandidateProfile] = useState<CandidateFullProfile | null>(null)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  // Fetch data on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        const [jobsData, metricsData, candidatesData] = await Promise.all([
+          getJobs(),
+          getDashboardMetrics(),
+          getCandidates(),
+        ])
+        setJobs(jobsData)
+        setMetrics(metricsData)
+        setCandidates(candidatesData)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+        // Use mock data as fallback
+        setJobs(mockJobs)
+        setMetrics(mockMetrics)
+        setCandidates(mockCandidates)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
+
+  // Fetch candidate profile when selected
+  useEffect(() => {
+    if (selectedCandidateId) {
+      getCandidateProfile(selectedCandidateId).then(setSelectedCandidateProfile)
+    } else {
+      setSelectedCandidateProfile(null)
+    }
+  }, [selectedCandidateId])
 
   const allJobsDefault: JobPostingInfo = {
     jobId: "all",
@@ -278,7 +319,7 @@ export default function RecruiterDashboard() {
     salaryRange: { minSalary: 0, maxSalary: 999999, currency: "AUD" },
     requiredSkills: [],
   }
-  const baseJob = selectedJobId === "all" ? allJobsDefault : (mockJobs.find((job) => job.jobId === selectedJobId) || mockJobs[0])
+  const baseJob = selectedJobId === "all" ? allJobsDefault : (jobs.find((job) => job.jobId === selectedJobId) || jobs[0])
   const currentJob = { ...baseJob, ...jobOverrides }
   
   const handleJobInfoUpdate = (updates: Partial<JobPostingInfo>) => {
@@ -286,7 +327,7 @@ export default function RecruiterDashboard() {
   }
   
   // Filter candidates by location and skill match, then sort
-  const filteredAndSortedCandidates = mockCandidates
+  const filteredAndSortedCandidates = candidates
     .filter(candidate => {
       // Location filter: "All Locations" shows everyone, otherwise match job location or Remote
       const jobLocation = currentJob.location
@@ -381,16 +422,20 @@ export default function RecruiterDashboard() {
       {/* Main content */}
       <main className="container mx-auto px-6 py-8">
         {/* Job posting block with inline metrics */}
-        <JobBlock 
-          jobInfo={currentJob}
-          metrics={mockMetrics}
-          allJobs={mockJobs.map((j) => ({ jobId: j.jobId, jobTitle: j.jobTitle }))}
+        {loading ? (
+          <div className="text-center py-8">Loading...</div>
+        ) : (
+          <JobBlock 
+            jobInfo={currentJob}
+            metrics={metrics || mockMetrics}
+            allJobs={jobs.map((j) => ({ jobId: j.jobId, jobTitle: j.jobTitle }))}
           onJobChange={(jobId) => {
             setSelectedJobId(jobId)
             setJobOverrides({}) // Reset overrides when changing jobs
           }}
-          onJobInfoUpdate={handleJobInfoUpdate}
-        />
+            onJobInfoUpdate={handleJobInfoUpdate}
+          />
+        )}
 
         {/* Section title + sort */}
         <div className="flex items-center justify-between mb-4">
@@ -430,7 +475,7 @@ export default function RecruiterDashboard() {
       <CandidateDetailModal
         isOpen={isDetailModalOpen}
         onClose={handleCloseModal}
-        candidateProfile={selectedCandidateId ? mockFullProfile : null}
+        candidateProfile={selectedCandidateProfile}
         onMoveToInterview={(id) => console.log("Move to interview:", id)}
         onReject={(id) => console.log("Reject candidate:", id)}
         onViewResume={(url) => console.log("View resume:", url)}

@@ -89,3 +89,10 @@ export interface PipelineStage {
   stageName: string
   candidateCount: number
 }
+
+export interface CandidateListItem {
+  candidateInfo: CandidateBasicInfo
+  engineeringType: "Full-Stack" | "Frontend" | "Backend"
+  matchScore: MatchScore
+  topSkills: string[]
+}

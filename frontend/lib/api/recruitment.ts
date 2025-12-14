@@ -1,51 +1,57 @@
-import type { JobPostingInfo, DashboardMetrics, CandidateFullProfile } from "@/lib/types"
-import { mockJobs, mockMetrics, mockCandidates, mockFullProfile, type CandidateListItem } from "./mock-data"
+import type { JobPostingInfo, DashboardMetrics, CandidateFullProfile, CandidateListItem } from "@/lib/types"
+import { mockJobs, mockMetrics, mockCandidates, mockFullProfile } from "./mock-data"
+import { getApplications, getApplication } from "./applications"
+import { 
+  transformDecisionCardToCandidate, 
+  transformApplicationToFullProfile,
+  calculateDashboardMetrics 
+} from "./transformers"
 
 const USE_MOCKS = process.env.NEXT_PUBLIC_USE_MOCKS === "true"
 
 /**
  * Get all available job postings
+ * Note: Backend doesn't have a jobs endpoint, so we return mock jobs for now
  */
 export async function getJobs(): Promise<JobPostingInfo[]> {
-  if (USE_MOCKS) {
-    return mockJobs
-  }
-  
-  const res = await fetch("/api/recruitment/jobs")
-  if (!res.ok) {
-    throw new Error("Failed to fetch jobs")
-  }
-  return res.json()
+  // Backend doesn't have jobs endpoint, return mock data
+  return mockJobs
 }
 
 /**
- * Get dashboard metrics
+ * Get dashboard metrics from applications
  */
 export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   if (USE_MOCKS) {
     return mockMetrics
   }
   
-  const res = await fetch("/api/recruitment/metrics")
-  if (!res.ok) {
-    throw new Error("Failed to fetch dashboard metrics")
+  try {
+    const applications = await getApplications()
+    return calculateDashboardMetrics(applications)
+  } catch (error) {
+    console.error('Error fetching dashboard metrics:', error)
+    // Return mock metrics as fallback
+    return mockMetrics
   }
-  return res.json()
 }
 
 /**
- * Get all candidates (list view)
+ * Get all candidates (list view) from applications
  */
 export async function getCandidates(): Promise<CandidateListItem[]> {
   if (USE_MOCKS) {
     return mockCandidates
   }
   
-  const res = await fetch("/api/recruitment/candidates")
-  if (!res.ok) {
-    throw new Error("Failed to fetch candidates")
+  try {
+    const applications = await getApplications()
+    return applications.map(transformDecisionCardToCandidate)
+  } catch (error) {
+    console.error('Error fetching candidates:', error)
+    // Return mock candidates as fallback
+    return mockCandidates
   }
-  return res.json()
 }
 
 /**
@@ -60,13 +66,15 @@ export async function getCandidateProfile(candidateId: string): Promise<Candidat
     return null
   }
   
-  const res = await fetch(`/api/recruitment/candidates/${candidateId}`)
-  if (!res.ok) {
-    if (res.status === 404) {
+  try {
+    const application = await getApplication(candidateId)
+    if (!application) {
       return null
     }
-    throw new Error("Failed to fetch candidate profile")
+    return transformApplicationToFullProfile(application)
+  } catch (error) {
+    console.error('Error fetching candidate profile:', error)
+    return null
   }
-  return res.json()
 }
 

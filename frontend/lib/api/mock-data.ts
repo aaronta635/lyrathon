@@ -1,4 +1,4 @@
-import type { JobPostingInfo, DashboardMetrics, CandidateFullProfile } from "@/lib/types"
+import type { JobPostingInfo, DashboardMetrics, CandidateFullProfile, CandidateListItem } from "@/lib/types"
 
 export const mockJobs: JobPostingInfo[] = [
   {

@@ -96,13 +96,45 @@ export function ApplicantPage2Form() {
 
     setIsSubmitting(true)
 
-    sessionStorage.setItem("applicant_page_2_data", JSON.stringify(formData))
+    try {
+      // Get application ID from session storage
+      const applicationId = sessionStorage.getItem('application_id')
+      if (!applicationId) {
+        throw new Error('Application ID not found. Please start from page 1.')
+      }
 
-    await new Promise((resolve) => setTimeout(resolve, 500))
+      // Import API function
+      const { updateApplicationMedia } = await import('@/lib/api/applications')
+      
+      // Get first YouTube URL
+      const videoUrl = formData.youtubeUrls.find(url => url.trim() !== '') || ''
+      
+      // Get first website URL and its login requirement
+      const websiteData = formData.websiteUrlsWithLogin.find(item => item.url.trim() !== '')
+      const deployUrl = websiteData?.url || ''
+      const canViewWithoutLogin = websiteData ? !websiteData.requiresLogin : undefined
+      const canEmbed = websiteData ? true : undefined // Default to true if website provided
 
-    setIsSubmitting(false)
+      // Update application media via API
+      await updateApplicationMedia(applicationId, {
+        video_url: videoUrl,
+        deploy_url: deployUrl || undefined,
+        can_view_without_login: canViewWithoutLogin,
+        can_embed: canEmbed,
+      })
 
-    window.location.href = "/applicant/verify_email"
+      // Store page 2 data
+      sessionStorage.setItem('applicant_page_2_data', JSON.stringify(formData))
+
+      // Redirect to verification
+      window.location.href = '/applicant/verify_email'
+    } catch (error) {
+      console.error('Error updating application media:', error)
+      setFormErrors({
+        submit: error instanceof Error ? error.message : 'Failed to update application. Please try again.',
+      })
+      setIsSubmitting(false)
+    }
   }
 
   const handleBack = () => {
@@ -160,9 +192,12 @@ export function ApplicantPage2Form() {
           disabled={isSubmitting}
           className="bg-peach-orange hover:bg-light-peach text-navy-blue font-semibold transition-all hover:scale-105"
         >
-          {isSubmitting ? "Processing..." : "Continue to Verification"}
+          {isSubmitting ? "Submitting..." : "Continue to Verification"}
           <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
+        {formErrors.submit && (
+          <div className="text-red-600 text-sm mt-2">{formErrors.submit}</div>
+        )}
       </div>
     </form>
   )

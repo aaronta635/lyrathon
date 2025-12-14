@@ -119,13 +119,47 @@ export function ApplicantPage1Form() {
 
     setIsSubmitting(true)
 
-    sessionStorage.setItem("applicant_page_1_data", JSON.stringify(formData))
+    try {
+      // Import API function
+      const { createApplication } = await import('@/lib/api/applications')
+      
+      // Get the first GitHub URL (backend expects single URL)
+      const githubUrl = formData.githubProjectUrls.find(url => url.trim() !== '') || ''
+      
+      // Map jobArea to focus (fullstack, frontend, backend)
+      const focusMap: Record<string, 'fullstack' | 'frontend' | 'backend'> = {
+        'fullstack': 'fullstack',
+        'frontend': 'frontend',
+        'backend': 'backend',
+      }
+      const focus = focusMap[formData.jobArea.toLowerCase()] || 'fullstack'
 
-    await new Promise((resolve) => setTimeout(resolve, 500))
+      // Create application via API
+      const response = await createApplication({
+        name: formData.fullName,
+        email: formData.email,
+        github_url: githubUrl,
+        focus: focus,
+        resume: formData.resumeFile!,
+      })
 
-    setIsSubmitting(false)
+      // Store application ID and form data for page 2
+      sessionStorage.setItem('application_id', response.id)
+      sessionStorage.setItem('applicant_page_1_data', JSON.stringify({
+        ...formData,
+        applicationId: response.id,
+        applicationStatus: response.status,
+      }))
 
-    window.location.href = "/applicant/page_2"
+      // Redirect to page 2
+      window.location.href = '/applicant/page_2'
+    } catch (error) {
+      console.error('Error submitting application:', error)
+      setFormErrors({
+        submit: error instanceof Error ? error.message : 'Failed to submit application. Please try again.',
+      })
+      setIsSubmitting(false)
+    }
   }
 
   const handleCloseSuccessModal = () => {
@@ -228,9 +262,12 @@ export function ApplicantPage1Form() {
             disabled={isSubmitting}
             className="bg-peach-orange hover:bg-light-peach text-navy-blue font-semibold transition-all hover:scale-105"
           >
-            {isSubmitting ? "Processing..." : "Continue"}
+            {isSubmitting ? "Submitting..." : "Continue"}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
+          {formErrors.submit && (
+            <div className="text-red-600 text-sm mt-2">{formErrors.submit}</div>
+          )}
         </div>
       </form>
     </>
