@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Calendar } from "lucide-react"
 import { JobBlock } from "@/components/recruitment/job-block"
 import { CandidateCard } from "@/components/recruitment/candidate-card"
@@ -270,6 +270,36 @@ export default function RecruitmentDashboard() {
   const [sortBy, setSortBy] = useState("score-desc")
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
+  const [toInterviewIds, setToInterviewIds] = useState<string[]>([])
+  const [rejectedIds, setRejectedIds] = useState<string[]>([])
+
+  // Persist view state locally
+  useEffect(() => {
+    const saved = localStorage.getItem("recruiter-state")
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        if (parsed.selectedJobId) setSelectedJobId(parsed.selectedJobId)
+        if (parsed.jobOverrides) setJobOverrides(parsed.jobOverrides)
+        if (parsed.sortBy) setSortBy(parsed.sortBy)
+        if (parsed.toInterviewIds) setToInterviewIds(parsed.toInterviewIds)
+        if (parsed.rejectedIds) setRejectedIds(parsed.rejectedIds)
+      } catch (e) {
+        console.error("Failed to parse saved recruiter state", e)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    const payload = {
+      selectedJobId,
+      jobOverrides,
+      sortBy,
+      toInterviewIds,
+      rejectedIds,
+    }
+    localStorage.setItem("recruiter-state", JSON.stringify(payload))
+  }, [selectedJobId, jobOverrides, sortBy, toInterviewIds, rejectedIds])
 
   const allJobsDefault: JobPostingInfo = {
     jobId: "all",
@@ -301,6 +331,7 @@ export default function RecruitmentDashboard() {
   // Filter candidates by engineering type, location, and skill match
   const filteredAndSortedCandidates = mockCandidates
     .filter(candidate => {
+      if (rejectedIds.includes(candidate.candidateInfo.candidateId)) return false
       // Engineering type match: if job has specific type, candidate must match
       const typeMatch = jobTypes.length === 0 || jobTypes.includes(candidate.engineeringType)
       
@@ -335,40 +366,68 @@ export default function RecruitmentDashboard() {
       // Must match ALL: type AND location AND availability AND salary AND skills
       return typeMatch && locationMatch && availabilityMatch && salaryMatch && hasSkillMatch
     })
-    .map(candidate => {
-      // Recalculate match score based on skill overlap
-      const skillOverlap = currentJob.requiredSkills.length > 0 
-        ? currentJob.requiredSkills.filter(skill =>
-            candidate.topSkills.some(s => s.toLowerCase().includes(skill.toLowerCase()))
-          ).length
-        : candidate.topSkills.length
-      const skillMatchPercent = currentJob.requiredSkills.length > 0
-        ? Math.round((skillOverlap / currentJob.requiredSkills.length) * 100)
-        : 100
-      
-      return {
-        ...candidate,
-        dynamicScore: Math.round((candidate.matchScore.overallScore + skillMatchPercent) / 2)
-      }
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case "score-desc":
-          return b.dynamicScore - a.dynamicScore
-        case "score-asc":
-          return a.dynamicScore - b.dynamicScore
-        case "exp-desc":
-          return b.candidateInfo.yearsOfExperience - a.candidateInfo.yearsOfExperience
-        case "exp-asc":
-          return a.candidateInfo.yearsOfExperience - b.candidateInfo.yearsOfExperience
-        default:
-          return 0
-      }
-    })
+
+  const computeDynamicScore = (candidate: typeof mockCandidates[number]) => {
+    const skillOverlap = currentJob.requiredSkills.length > 0 
+      ? currentJob.requiredSkills.filter(skill =>
+          candidate.topSkills.some(s => s.toLowerCase().includes(skill.toLowerCase()))
+        ).length
+      : candidate.topSkills.length
+    const skillMatchPercent = currentJob.requiredSkills.length > 0
+      ? Math.round((skillOverlap / currentJob.requiredSkills.length) * 100)
+      : 100
+    return Math.round((candidate.matchScore.overallScore + skillMatchPercent) / 2)
+  }
+
+  const withDynamic = filteredAndSortedCandidates.map((candidate) => ({
+    ...candidate,
+    dynamicScore: computeDynamicScore(candidate),
+  })).sort((a, b) => {
+    switch (sortBy) {
+      case "score-desc":
+        return b.dynamicScore - a.dynamicScore
+      case "score-asc":
+        return a.dynamicScore - b.dynamicScore
+      case "exp-desc":
+        return b.candidateInfo.yearsOfExperience - a.candidateInfo.yearsOfExperience
+      case "exp-asc":
+        return a.candidateInfo.yearsOfExperience - b.candidateInfo.yearsOfExperience
+      default:
+        return 0
+    }
+  })
+
+  const talentPoolCandidates = withDynamic.filter(
+    (c) => !toInterviewIds.includes(c.candidateInfo.candidateId)
+  )
+
+  const toInterviewCandidates = toInterviewIds
+    .map((id) => withDynamic.find((c) => c.candidateInfo.candidateId === id) || mockCandidates.find((c) => c.candidateInfo.candidateId === id))
+    .filter((c): c is typeof withDynamic[number] => Boolean(c))
+    .map((candidate) => ({
+      ...candidate,
+      dynamicScore: "dynamicScore" in candidate ? candidate.dynamicScore : computeDynamicScore(candidate),
+    }))
 
   const handleCandidateClick = (candidateId: string) => {
     setSelectedCandidateId(candidateId)
     setIsDetailModalOpen(true)
+  }
+
+  const handleMoveToInterview = (candidateId: string) => {
+    setToInterviewIds((prev) =>
+      prev.includes(candidateId) ? prev : [...prev, candidateId]
+    )
+    setRejectedIds((prev) => prev.filter((id) => id !== candidateId))
+  }
+
+  const handleReject = (candidateId: string) => {
+    setRejectedIds((prev) =>
+      prev.includes(candidateId) ? prev : [...prev, candidateId]
+    )
+    setToInterviewIds((prev) => prev.filter((id) => id !== candidateId))
+    setIsDetailModalOpen(false)
+    setSelectedCandidateId(null)
   }
 
   const handleCloseModal = () => {
@@ -443,7 +502,16 @@ export default function RecruitmentDashboard() {
         {/* Job posting block with inline metrics */}
         <JobBlock 
           jobInfo={currentJob}
-          metrics={mockMetrics}
+          metrics={{
+            totalCandidates: talentPoolCandidates.length,
+            averageMatchScore: talentPoolCandidates.length
+              ? Math.round(
+                  talentPoolCandidates.reduce((sum, c) => sum + c.dynamicScore, 0) /
+                  talentPoolCandidates.length
+                )
+              : 0,
+            interviewCount: toInterviewCandidates.length,
+          }}
           allJobs={mockJobs.map((j) => ({ jobId: j.jobId, jobTitle: j.jobTitle }))}
           onJobChange={(jobId) => {
             setSelectedJobId(jobId)
@@ -453,38 +521,74 @@ export default function RecruitmentDashboard() {
         />
 
         {/* Section title + sort */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-foreground">{filteredAndSortedCandidates.length} Applicants</h2>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground font-medium">Sort by:</span>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[180px] h-9 text-sm font-medium">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="score-desc">Match Score ↓</SelectItem>
-                <SelectItem value="score-asc">Match Score ↑</SelectItem>
-                <SelectItem value="exp-desc">Experience ↓</SelectItem>
-                <SelectItem value="exp-asc">Experience ↑</SelectItem>
-              </SelectContent>
-            </Select>
+        <div className="flex flex-col xl:flex-row gap-6 px-0">
+          {/* Talent Pool (left) */}
+          <div className="flex-1 xl:basis-[68%]">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground">{talentPoolCandidates.length} Applicants</h2>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-muted-foreground font-medium">Sort by:</span>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-[180px] h-9 text-sm font-medium">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="score-desc">Match Score ↓</SelectItem>
+                    <SelectItem value="score-asc">Match Score ↑</SelectItem>
+                    <SelectItem value="exp-desc">Experience ↓</SelectItem>
+                    <SelectItem value="exp-asc">Experience ↑</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {talentPoolCandidates.map((candidate) => (
+                <CandidateCard
+                  key={candidate.candidateInfo.candidateId}
+                  candidateInfo={candidate.candidateInfo}
+                  matchScore={{ ...candidate.matchScore, overallScore: candidate.dynamicScore }}
+                  topSkills={candidate.topSkills}
+                  engineeringType={candidate.engineeringType}
+                  availability={candidate.availability}
+                  expectedSalary={candidate.expectedSalary}
+                  onCardClick={handleCandidateClick}
+                />
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Candidate cards grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredAndSortedCandidates.map((candidate) => (
-            <CandidateCard
-              key={candidate.candidateInfo.candidateId}
-              candidateInfo={candidate.candidateInfo}
-              matchScore={{ ...candidate.matchScore, overallScore: candidate.dynamicScore }}
-              topSkills={candidate.topSkills}
-              engineeringType={candidate.engineeringType}
-              availability={candidate.availability}
-              expectedSalary={candidate.expectedSalary}
-              onCardClick={handleCandidateClick}
-            />
-          ))}
+          {/* To be interviewed column (right) */}
+          <div className="xl:basis-[30%] xl:sticky xl:top-6 h-fit">
+            <div
+              className="rounded-xl bg-card p-4"
+              style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)", borderTop: "3px solid #8B5CF6" }}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-foreground">To be interviewed</h3>
+                <span className="text-xs px-2 py-1 rounded-full bg-accent/15 text-accent font-semibold">
+                  {toInterviewCandidates.length}
+                </span>
+              </div>
+              <div className="flex flex-col gap-3">
+                {toInterviewCandidates.length === 0 && (
+                  <p className="text-xs text-muted-foreground">No candidates added yet.</p>
+                )}
+                {toInterviewCandidates.map((candidate) => (
+                  <CandidateCard
+                    key={`interview-${candidate.candidateInfo.candidateId}`}
+                    candidateInfo={candidate.candidateInfo}
+                    matchScore={{ ...candidate.matchScore, overallScore: candidate.dynamicScore }}
+                    topSkills={candidate.topSkills}
+                    engineeringType={candidate.engineeringType}
+                    availability={candidate.availability}
+                    expectedSalary={candidate.expectedSalary}
+                    borderColorOverride="#8B5CF6"
+                    onCardClick={undefined}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </main>
 
@@ -494,8 +598,8 @@ export default function RecruitmentDashboard() {
         onClose={handleCloseModal}
         candidateProfile={selectedCandidateId ? mockFullProfile : null}
         jobRequiredSkills={currentJob.requiredSkills}
-        onMoveToInterview={(id) => console.log("Move to interview:", id)}
-        onReject={(id) => console.log("Reject candidate:", id)}
+        onMoveToInterview={handleMoveToInterview}
+        onReject={handleReject}
         onViewResume={(url) => console.log("View resume:", url)}
       />
     </div>

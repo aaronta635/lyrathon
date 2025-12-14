@@ -2,11 +2,15 @@ import { Card } from "@/components/ui/card"
 import { JobTitle } from "./job-title"
 import { JobDetails } from "./job-details"
 import { Users, Target, Calendar } from "lucide-react"
-import type { JobPostingInfo, DashboardMetrics } from "@/lib/types"
+import type { JobPostingInfo } from "@/lib/types"
 
 interface JobBlockProps {
   jobInfo: JobPostingInfo
-  metrics: DashboardMetrics
+  metrics: {
+    totalCandidates: number
+    averageMatchScore: number
+    interviewCount: number
+  }
   allJobs: { jobId: string; jobTitle: string }[]
   onJobChange: (jobId: string) => void
   onJobInfoUpdate?: (updates: Partial<JobPostingInfo>) => void
@@ -23,6 +27,7 @@ const getScoreColor = (score: number) => {
 
 export function JobBlock({ jobInfo, metrics, allJobs, onJobChange, onJobInfoUpdate, className = "" }: JobBlockProps) {
   const avgMatchColor = getScoreColor(metrics.averageMatchScore)
+  const interviewColor = "#8B5CF6"
 
   return (
     <Card 
@@ -39,39 +44,39 @@ export function JobBlock({ jobInfo, metrics, allJobs, onJobChange, onJobInfoUpda
         <div className="flex items-center gap-4">
           {/* Metric cards */}
           <div 
-            className="flex items-center gap-3 bg-card px-5 py-3 rounded-xl"
-            style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}
+            className="flex items-center gap-3 bg-white px-5 py-4 rounded-xl"
+            style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
           >
-            <div className="p-2 rounded-lg bg-primary/10">
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
               <Users className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-primary">{metrics.totalCandidates}</p>
-              <p className="text-xs text-muted-foreground">Candidates</p>
+              <p className="text-2xl font-bold text-foreground">{metrics.totalCandidates}</p>
+              <p className="text-sm text-muted-foreground">Applicants</p>
             </div>
           </div>
           <div 
-            className="flex items-center gap-3 bg-card px-5 py-3 rounded-xl"
-            style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}
+            className="flex items-center gap-3 bg-white px-5 py-4 rounded-xl"
+            style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
           >
-            <div className="p-2 rounded-lg" style={{ backgroundColor: `${avgMatchColor}15` }}>
+            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: `${avgMatchColor}20` }}>
               <Target className="h-5 w-5" style={{ color: avgMatchColor }} />
             </div>
             <div>
               <p className="text-2xl font-bold" style={{ color: avgMatchColor }}>{metrics.averageMatchScore}%</p>
-              <p className="text-xs text-muted-foreground">Avg Match</p>
+              <p className="text-sm text-muted-foreground">Avg Match</p>
             </div>
           </div>
           <div 
-            className="flex items-center gap-3 bg-card px-5 py-3 rounded-xl"
-            style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}
+            className="flex items-center gap-3 bg-white px-5 py-4 rounded-xl"
+            style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
           >
-            <div className="p-2 rounded-lg bg-secondary/10">
-              <Calendar className="h-5 w-5 text-secondary" />
+            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: `${interviewColor}20` }}>
+              <Calendar className="h-5 w-5" style={{ color: interviewColor }} />
             </div>
             <div>
-              <p className="text-2xl font-bold text-secondary">{metrics.activeInterviews}</p>
-              <p className="text-xs text-muted-foreground">Interviews</p>
+              <p className="text-2xl font-bold" style={{ color: interviewColor }}>{metrics.interviewCount}</p>
+              <p className="text-sm text-muted-foreground">To be interviewed</p>
             </div>
           </div>
         </div>

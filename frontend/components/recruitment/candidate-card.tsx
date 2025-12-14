@@ -11,10 +11,19 @@ interface CandidateCardProps {
   engineeringType?: string
   availability?: string
   expectedSalary?: number
+  borderColorOverride?: string
   onCardClick?: (candidateId: string) => void
 }
 
-export function CandidateCard({ candidateInfo, matchScore, topSkills, engineeringType, expectedSalary, onCardClick }: CandidateCardProps) {
+export function CandidateCard({
+  candidateInfo,
+  matchScore,
+  topSkills,
+  engineeringType,
+  expectedSalary,
+  borderColorOverride,
+  onCardClick,
+}: CandidateCardProps) {
   // Color-coded match system
   const getScoreColor = (score: number) => {
     if (score >= 90) return "#10B981" // Dark green - Excellent
@@ -23,7 +32,7 @@ export function CandidateCard({ candidateInfo, matchScore, topSkills, engineerin
     return "#FF6B6B" // Coral red - Weak
   }
 
-  const scoreColor = getScoreColor(matchScore.overallScore)
+  const scoreColor = borderColorOverride || getScoreColor(matchScore.overallScore)
 
   const formatSalary = (salary: number) => `$${Math.round(salary / 1000)}k`
 
@@ -44,7 +53,7 @@ export function CandidateCard({ candidateInfo, matchScore, topSkills, engineerin
     >
       {/* Match score badge - top right */}
       <div 
-        className="absolute top-4 right-4 px-3.5 py-2 rounded-lg text-sm font-semibold text-white transition-all duration-200 hover:brightness-90"
+        className="absolute top-4 right-4 px-4 py-2 rounded-lg text-base font-bold text-white transition-all duration-200 hover:brightness-90"
         style={{ 
           backgroundColor: scoreColor,
           boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
