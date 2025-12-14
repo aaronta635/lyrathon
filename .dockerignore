@@ -1,0 +1,23 @@
+# Exclude frontend and other unnecessary files
+frontend/
+node_modules/
+.git/
+.env
+*.md
+DEPLOYMENT.md
+RAILWAY_DEPLOY.md
+PRODUCTION_CHECKLIST.md
+
+# Exclude backend files we don't need in production
+backend/.env
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.db
+backend/test.db
+backend/uploads/
+backend/.gitignore
+backend/clear_db.py
+backend/fix_duplicate_recommendations.py
+backend/test_verification.py
+backend/validate_env.py
+
