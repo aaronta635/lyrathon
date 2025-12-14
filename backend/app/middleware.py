@@ -14,17 +14,24 @@ def add_middlewares(app):
     if settings.debug or not frontend_url:
         # Development: allow all origins
         origins = ['*']
+        allow_credentials = False  # Can't use credentials with wildcard
     else:
         # Production: restrict to frontend domain
         origins = [frontend_url]
-        # Also allow localhost for testing (optional, only in debug mode)
-        if settings.debug:
-            origins.append('http://localhost:3000')
+        # Always allow localhost for local development/testing
+        # This won't affect production security since localhost can't be accessed from outside
+        origins.extend([
+            'http://localhost:3000',
+            'http://localhost:3001',
+            'http://127.0.0.1:3000',
+            'http://127.0.0.1:3001',
+        ])
+        allow_credentials = True
     
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
-        allow_credentials=True,
+        allow_credentials=allow_credentials,
         allow_methods=['*'],
         allow_headers=['*']
     )
