@@ -12,7 +12,7 @@ export function SkillBadge({ skillName, variant = "default", size = "md" }: Skil
   }
 
   const sizeClasses = {
-    sm: "text-xs px-2 py-1",
+    sm: "text-[10px] px-1.5 py-0.5",
     md: "text-sm px-3 py-1",
     lg: "text-base px-4 py-2",
   }

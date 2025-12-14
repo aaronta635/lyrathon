@@ -1,28 +1,70 @@
 "use client"
 
 import { useState } from "react"
-import { Calendar, Search } from "lucide-react"
+import { Calendar } from "lucide-react"
 import { JobBlock } from "@/components/recruitment/job-block"
-import { DashboardHeader } from "@/components/recruitment/dashboard-header"
-import { SearchFilterBar } from "@/components/recruitment/search-filter-bar"
 import { CandidateCard } from "@/components/recruitment/candidate-card"
 import { CandidateDetailModal } from "@/components/recruitment/candidate-detail-modal"
-import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import type { JobPostingInfo, DashboardMetrics, CandidateFullProfile } from "@/lib/types"
 
 // Mock data for demonstration
-const mockJobInfo: JobPostingInfo = {
-  jobId: "job-001",
-  jobTitle: "Senior Full-Stack Engineer",
-  location: "Sydney",
-  employmentType: "full-time",
-  salaryRange: {
-    minSalary: 140000,
-    maxSalary: 180000,
-    currency: "AUD",
+const mockJobs: JobPostingInfo[] = [
+  {
+    jobId: "job-001",
+    jobTitle: "Senior Full-Stack Engineer",
+    location: "Sydney",
+    employmentType: "full-time",
+    salaryRange: {
+      minSalary: 140000,
+      maxSalary: 180000,
+      currency: "AUD",
+    },
+    requiredSkills: ["AWS", "PostgreSQL", "React", "Node.js"],
   },
-  requiredSkills: ["AWS", "PostgreSQL", "React", "Node.js"],
-}
+  {
+    jobId: "job-002",
+    jobTitle: "Frontend Developer",
+    location: "Melbourne",
+    employmentType: "full-time",
+    salaryRange: {
+      minSalary: 100000,
+      maxSalary: 130000,
+      currency: "AUD",
+    },
+    requiredSkills: ["React", "TypeScript", "CSS", "Figma"],
+  },
+  {
+    jobId: "job-003",
+    jobTitle: "Backend Engineer",
+    location: "Sydney",
+    employmentType: "full-time",
+    salaryRange: {
+      minSalary: 120000,
+      maxSalary: 160000,
+      currency: "AUD",
+    },
+    requiredSkills: ["Python", "PostgreSQL", "AWS", "Docker"],
+  },
+  {
+    jobId: "job-004",
+    jobTitle: "DevOps Engineer",
+    location: "Remote",
+    employmentType: "contract",
+    salaryRange: {
+      minSalary: 130000,
+      maxSalary: 170000,
+      currency: "AUD",
+    },
+    requiredSkills: ["Kubernetes", "AWS", "Terraform", "CI/CD"],
+  },
+]
 
 const mockMetrics: DashboardMetrics = {
   totalCandidates: 6,
@@ -44,6 +86,7 @@ const mockCandidates = [
       yearsOfExperience: 5,
       currentCompany: "Tech Corp",
     },
+    engineeringType: "Full-Stack",
     matchScore: {
       overallScore: 92,
       skillMatchScore: 95,
@@ -60,6 +103,7 @@ const mockCandidates = [
       yearsOfExperience: 3,
       currentCompany: "StartupXYZ",
     },
+    engineeringType: "Backend",
     matchScore: {
       overallScore: 78,
       skillMatchScore: 80,
@@ -76,6 +120,7 @@ const mockCandidates = [
       yearsOfExperience: 4,
       currentCompany: "Digital Agency",
     },
+    engineeringType: "Frontend",
     matchScore: {
       overallScore: 85,
       skillMatchScore: 88,
@@ -92,6 +137,7 @@ const mockCandidates = [
       yearsOfExperience: 2,
       currentCompany: "Consulting Firm",
     },
+    engineeringType: "Frontend",
     matchScore: {
       overallScore: 65,
       skillMatchScore: 70,
@@ -99,6 +145,40 @@ const mockCandidates = [
       fitLevel: "weak" as const,
     },
     topSkills: ["JavaScript", "Vue.js", "MongoDB"],
+  },
+  {
+    candidateInfo: {
+      candidateId: "cand-005",
+      fullName: "Lisa Kumar",
+      location: "Remote",
+      yearsOfExperience: 6,
+      currentCompany: "CloudTech Inc",
+    },
+    engineeringType: "DevOps",
+    matchScore: {
+      overallScore: 88,
+      skillMatchScore: 90,
+      experienceMatchScore: 85,
+      fitLevel: "strong" as const,
+    },
+    topSkills: ["Kubernetes", "AWS", "Terraform"],
+  },
+  {
+    candidateInfo: {
+      candidateId: "cand-006",
+      fullName: "Tom Wilson",
+      location: "Sydney, AU",
+      yearsOfExperience: 7,
+      currentCompany: "Enterprise Corp",
+    },
+    engineeringType: "Full-Stack",
+    matchScore: {
+      overallScore: 95,
+      skillMatchScore: 98,
+      experienceMatchScore: 92,
+      fitLevel: "strong" as const,
+    },
+    topSkills: ["React", "Node.js", "PostgreSQL"],
   },
 ]
 
@@ -158,14 +238,85 @@ const mockFullProfile: CandidateFullProfile = {
   },
   professionalSummary: "Backend engineer with verified AWS + SQL experience, Sydney-based, 5 years experience.",
   resumeUrl: "/resumes/sarah-chen.pdf",
+  strengths: [
+    "Strong React and TypeScript expertise",
+    "Proven AWS cloud experience",
+    "Excellent code quality scores",
+  ],
+  risks: [
+    "Limited Next.js App Router experience",
+    "No Tailwind CSS v4 experience",
+    "Unfamiliar with Radix UI primitives",
+  ],
 }
 
 export default function RecruitmentDashboard() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedRole, setSelectedRole] = useState("all")
-  const [selectedSkillFilter, setSelectedSkillFilter] = useState("all")
+  const [selectedJobId, setSelectedJobId] = useState("job-001")
+  const [jobOverrides, setJobOverrides] = useState<Partial<JobPostingInfo>>({})
+  const [sortBy, setSortBy] = useState("score-desc")
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
+
+  const allJobsDefault: JobPostingInfo = {
+    jobId: "all",
+    jobTitle: "All Positions",
+    location: "All Locations",
+    employmentType: "all" as JobPostingInfo["employmentType"],
+    salaryRange: { minSalary: 0, maxSalary: 999999, currency: "AUD" },
+    requiredSkills: [],
+  }
+  const baseJob = selectedJobId === "all" ? allJobsDefault : (mockJobs.find((job) => job.jobId === selectedJobId) || mockJobs[0])
+  const currentJob = { ...baseJob, ...jobOverrides }
+  
+  const handleJobInfoUpdate = (updates: Partial<JobPostingInfo>) => {
+    setJobOverrides(prev => ({ ...prev, ...updates }))
+  }
+  
+  // Filter candidates by location and skill match, then sort
+  const filteredAndSortedCandidates = mockCandidates
+    .filter(candidate => {
+      // Location filter: "All Locations" shows everyone, otherwise match job location or Remote
+      const jobLocation = currentJob.location
+      const candidateLocation = candidate.candidateInfo.location.split(",")[0].trim()
+      const locationMatch = jobLocation === "All Locations" || jobLocation === "Remote" || candidateLocation === jobLocation || candidateLocation === "Remote"
+      
+      // Skill match: if no skills required or candidate has at least one required skill
+      const hasSkillMatch = currentJob.requiredSkills.length === 0 || currentJob.requiredSkills.some(skill => 
+        candidate.topSkills.some(s => s.toLowerCase().includes(skill.toLowerCase()))
+      )
+      
+      return locationMatch && hasSkillMatch
+    })
+    .map(candidate => {
+      // Recalculate match score based on skill overlap
+      const skillOverlap = currentJob.requiredSkills.length > 0 
+        ? currentJob.requiredSkills.filter(skill =>
+            candidate.topSkills.some(s => s.toLowerCase().includes(skill.toLowerCase()))
+          ).length
+        : candidate.topSkills.length
+      const skillMatchPercent = currentJob.requiredSkills.length > 0
+        ? Math.round((skillOverlap / currentJob.requiredSkills.length) * 100)
+        : 100
+      
+      return {
+        ...candidate,
+        dynamicScore: Math.round((candidate.matchScore.overallScore + skillMatchPercent) / 2)
+      }
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case "score-desc":
+          return b.dynamicScore - a.dynamicScore
+        case "score-asc":
+          return a.dynamicScore - b.dynamicScore
+        case "exp-desc":
+          return b.candidateInfo.yearsOfExperience - a.candidateInfo.yearsOfExperience
+        case "exp-asc":
+          return a.candidateInfo.yearsOfExperience - b.candidateInfo.yearsOfExperience
+        default:
+          return 0
+      }
+    })
 
   const handleCandidateClick = (candidateId: string) => {
     setSelectedCandidateId(candidateId)
@@ -207,52 +358,46 @@ export default function RecruitmentDashboard() {
 
       {/* Main content */}
       <main className="container mx-auto px-6 py-8">
-        {/* Job posting block */}
-        <JobBlock jobInfo={mockJobInfo} />
+        {/* Job posting block with inline metrics */}
+        <JobBlock 
+          jobInfo={currentJob}
+          metrics={mockMetrics}
+          allJobs={mockJobs.map((j) => ({ jobId: j.jobId, jobTitle: j.jobTitle }))}
+          onJobChange={(jobId) => {
+            setSelectedJobId(jobId)
+            setJobOverrides({}) // Reset overrides when changing jobs
+          }}
+          onJobInfoUpdate={handleJobInfoUpdate}
+        />
 
-        {/* Dashboard metrics */}
-        <DashboardHeader metrics={mockMetrics} />
-
-        {/* Section title */}
-        <h2 className="text-2xl font-bold text-foreground mb-6">4 Applicants</h2>
-
-        {/* Search and filters */}
-        <div className="mb-6">
-          <SearchFilterBar
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            selectedRole={selectedRole}
-            onRoleChange={setSelectedRole}
-            selectedSkillFilter={selectedSkillFilter}
-            onSkillFilterChange={setSelectedSkillFilter}
-            onAdvancedFiltersClick={() => console.log("Advanced filters clicked")}
-          />
-          {/* Search other positions */}
-          <div className="mt-4 flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">Search other positions:</span>
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search positions by title, location, or skills..."
-                className="pl-10"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    console.log("Searching other positions:", e.currentTarget.value)
-                  }
-                }}
-              />
-            </div>
+        {/* Section title + sort */}
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-foreground">{filteredAndSortedCandidates.length} Applicants</h2>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Sort:</span>
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[160px] h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="score-desc">Match Score ↓</SelectItem>
+                <SelectItem value="score-asc">Match Score ↑</SelectItem>
+                <SelectItem value="exp-desc">Experience ↓</SelectItem>
+                <SelectItem value="exp-asc">Experience ↑</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
         {/* Candidate cards grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {mockCandidates.map((candidate) => (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {filteredAndSortedCandidates.map((candidate) => (
             <CandidateCard
               key={candidate.candidateInfo.candidateId}
               candidateInfo={candidate.candidateInfo}
-              matchScore={candidate.matchScore}
+              matchScore={{ ...candidate.matchScore, overallScore: candidate.dynamicScore }}
               topSkills={candidate.topSkills}
+              engineeringType={candidate.engineeringType}
               onCardClick={handleCandidateClick}
             />
           ))}

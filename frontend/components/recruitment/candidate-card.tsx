@@ -3,47 +3,72 @@
 import { Card } from "@/components/ui/card"
 import { MapPin } from "lucide-react"
 import { SkillBadge } from "./skill-badge"
-import { FitLevelBadge } from "./fit-level-badge"
-import { MatchScoreDisplay } from "./match-score-display"
 import type { CandidateBasicInfo, MatchScore } from "@/lib/types"
 
 interface CandidateCardProps {
   candidateInfo: CandidateBasicInfo
   matchScore: MatchScore
   topSkills: string[]
+  engineeringType?: string
   onCardClick?: (candidateId: string) => void
 }
 
-export function CandidateCard({ candidateInfo, matchScore, topSkills, onCardClick }: CandidateCardProps) {
+export function CandidateCard({ candidateInfo, matchScore, topSkills, engineeringType, onCardClick }: CandidateCardProps) {
+  const getScoreBgColor = (score: number) => {
+    if (score >= 85) return "bg-success"
+    if (score >= 70) return "bg-warning"
+    return "bg-destructive"
+  }
+
+  const getEngTypeColor = (type: string) => {
+    switch (type) {
+      case "Full-Stack": return "bg-primary/10 text-primary"
+      case "Frontend": return "bg-info/10 text-info"
+      case "Backend": return "bg-success/10 text-success"
+      case "DevOps": return "bg-warning/10 text-warning"
+      default: return "bg-muted text-muted-foreground"
+    }
+  }
+
   return (
     <Card
-      className="p-6 hover:shadow-lg transition-all cursor-pointer hover:border-primary"
+      className="p-3 hover:shadow-lg transition-all cursor-pointer hover:border-primary"
       onClick={() => onCardClick?.(candidateInfo.candidateId)}
     >
-      {/* Candidate header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold text-foreground mb-1">{candidateInfo.fullName}</h3>
-          <div className="flex items-center text-sm text-muted-foreground">
-            <MapPin className="h-4 w-4 mr-1" />
-            <span>{candidateInfo.location}</span>
-          </div>
+      {/* Header: Name + Score */}
+      <div className="flex items-center justify-between mb-1">
+        <h3 className="text-sm font-semibold text-foreground truncate flex-1 mr-2">{candidateInfo.fullName}</h3>
+        <span className={`px-2 py-0.5 rounded text-sm font-bold text-white ${getScoreBgColor(matchScore.overallScore)}`}>
+          {matchScore.overallScore}%
+        </span>
+      </div>
+
+      {/* Engineering type badge */}
+      {engineeringType && (
+        <span className={`inline-block text-[10px] font-medium px-1.5 py-0.5 rounded mb-1 ${getEngTypeColor(engineeringType)}`}>
+          {engineeringType}
+        </span>
+      )}
+
+      {/* Location + Experience */}
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="flex items-center">
+          <MapPin className="h-3 w-3 mr-0.5" />
+          <span>{candidateInfo.location}</span>
         </div>
-        <MatchScoreDisplay scorePercentage={matchScore.overallScore} size="md" />
+        <span>•</span>
+        <span>{candidateInfo.yearsOfExperience}y exp</span>
       </div>
 
-      {/* Fit level badge */}
-      <div className="mb-4">
-        <FitLevelBadge fitLevel={matchScore.fitLevel} />
-      </div>
-
-      {/* Experience info */}
-      <p className="text-sm text-muted-foreground mb-4">{candidateInfo.yearsOfExperience} years exp</p>
-
-      {/* Top skills */}
-      <div className="flex flex-wrap gap-2">
-        {topSkills.slice(0, 3).map((skillName) => (
-          <SkillBadge key={skillName} skillName={skillName} size="sm" />
+      {/* Skills */}
+      <div className="flex flex-wrap gap-0.5 mt-1.5">
+        {topSkills.slice(0, 3).map((skillName, index) => (
+          <SkillBadge 
+            key={skillName} 
+            skillName={skillName} 
+            size="sm" 
+            variant={index === 0 ? "verified" : "default"}
+          />
         ))}
       </div>
     </Card>

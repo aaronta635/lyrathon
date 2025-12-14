@@ -26,16 +26,16 @@ export function GitHubSignalsCard({ githubMetrics }: GitHubSignalsCardProps) {
   ]
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <TrendingUp className="h-5 w-5" />
           GitHub Signals
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3">
         {signalItems.map((item, index) => (
-          <div key={index} className="flex items-start gap-3">
+          <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-background shadow-sm border">
             <div className={`p-1 rounded-full ${item.isPositive ? "bg-success/10" : "bg-muted"}`}>
               <CheckCircle className={`h-4 w-4 ${item.isPositive ? "text-success" : "text-muted-foreground"}`} />
             </div>

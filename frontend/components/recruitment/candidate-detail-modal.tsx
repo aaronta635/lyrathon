@@ -2,13 +2,15 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { MapPin, Calendar, ArrowLeft, CheckCircle, XCircle } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+import { MapPin, Calendar, ArrowLeft, CheckCircle, XCircle, FileText } from "lucide-react"
 import { MatchScoreDisplay } from "./match-score-display"
 import { FitLevelBadge } from "./fit-level-badge"
 import { SkillBadge } from "./skill-badge"
 import { BuiltProjectsCard } from "./built-projects-card"
 import { GitHubSignalsCard } from "./github-signals-card"
+import { StrengthsCard } from "./strengths-card"
+import { RisksCard } from "./risks-card"
 import type { CandidateFullProfile } from "@/lib/types"
 
 interface CandidateDetailModalProps {
@@ -30,93 +32,101 @@ export function CandidateDetailModal({
 }: CandidateDetailModalProps) {
   if (!candidateProfile) return null
 
-  const { basicInfo, matchScore, skills, projects, githubMetrics, professionalSummary, resumeUrl } = candidateProfile
+  const { basicInfo, matchScore, skills, projects, githubMetrics, professionalSummary, resumeUrl, strengths, risks } = candidateProfile
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="!max-w-[95vw] !w-[95vw] max-h-[95vh] h-[95vh] overflow-y-auto p-8">
-        {/* Back button */}
-        <Button variant="ghost" size="sm" onClick={onClose} className="absolute left-8 top-8 flex items-center gap-2 z-10">
-          <ArrowLeft className="h-4 w-4" />
-          Back to candidates
-        </Button>
+      <DialogContent className="!max-w-[60vw] !w-[60vw] max-h-[85vh] overflow-y-auto p-5">
+        {/* Back button - separate row */}
+        <div className="border-b pb-3 mb-4">
+          <Button variant="ghost" size="sm" onClick={onClose} className="flex items-center gap-1 text-xs -ml-2">
+            <ArrowLeft className="h-3 w-3" />
+            Back to candidates
+          </Button>
+        </div>
 
-        <DialogHeader className="mt-8 pr-8">
-          {/* Candidate header with match score */}
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex-1">
-              <DialogTitle className="text-3xl font-bold mb-2">{basicInfo.fullName}</DialogTitle>
-              <div className="flex items-center gap-4 text-muted-foreground mb-2">
-                <div className="flex items-center gap-1">
-                  <MapPin className="h-4 w-4" />
-                  <span>{basicInfo.location}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4" />
-                  <span>{basicInfo.yearsOfExperience} years experience</span>
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col items-end gap-2">
-              <MatchScoreDisplay scorePercentage={matchScore.overallScore} size="lg" />
-              <FitLevelBadge fitLevel={matchScore.fitLevel} />
-            </div>
-          </div>
-
-          {/* Professional summary */}
-          <p className="text-base text-muted-foreground leading-relaxed">{professionalSummary}</p>
+        <DialogHeader className="sr-only">
+          <DialogTitle>{basicInfo.fullName}</DialogTitle>
         </DialogHeader>
 
-        <Separator className="my-8" />
+        {/* Candidate info card */}
+        <Card className="mb-4">
+          <CardContent className="p-4">
+            {/* Header with name, location, experience and match score */}
+            <div className="flex items-start justify-between mb-2">
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold mb-1">{basicInfo.fullName}</h2>
+                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />
+                    <span>{basicInfo.location}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-3 w-3" />
+                    <span>{basicInfo.yearsOfExperience}y exp</span>
+                  </div>
+                  <button
+                    onClick={() => onViewResume?.(resumeUrl)}
+                    className="flex items-center gap-1 hover:text-foreground transition-colors"
+                  >
+                    <FileText className="h-3 w-3" />
+                    <span>Resume</span>
+                  </button>
+                </div>
+              </div>
+              <div className="flex flex-col items-end gap-1">
+                <MatchScoreDisplay scorePercentage={matchScore.overallScore} size="md" />
+                <FitLevelBadge fitLevel={matchScore.fitLevel} />
+              </div>
+            </div>
 
-        {/* Skills section */}
-        <div className="mb-8">
-          <h3 className="text-xl font-semibold mb-4">Skills</h3>
-          <div className="flex flex-wrap gap-3">
-            {skills.map((skill) => (
-              <SkillBadge
-                key={skill.skillName}
-                skillName={skill.skillName}
-                variant={skill.isVerified ? "verified" : "default"}
-              />
-            ))}
-          </div>
-        </div>
+            {/* Professional summary */}
+            <p className="text-sm text-muted-foreground leading-relaxed mb-3">{professionalSummary}</p>
 
-        <Separator className="my-8" />
+            {/* Skills section */}
+            <div className="flex flex-wrap gap-2">
+              {skills.map((skill) => (
+                <SkillBadge
+                  key={skill.skillName}
+                  skillName={skill.skillName}
+                  variant={skill.isVerified ? "verified" : "default"}
+                  size="sm"
+                />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Projects and GitHub signals grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <div className="min-w-0">
-            <BuiltProjectsCard
-              projects={projects}
-              onViewProject={(projectId) => console.log("View project:", projectId)}
-            />
-          </div>
-          {githubMetrics && (
-            <div className="min-w-0">
-              <GitHubSignalsCard githubMetrics={githubMetrics} />
-            </div>
-          )}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+          <BuiltProjectsCard
+            projects={projects}
+            onViewProject={(projectId) => console.log("View project:", projectId)}
+          />
+          {githubMetrics && <GitHubSignalsCard githubMetrics={githubMetrics} />}
         </div>
 
-        <Separator className="my-8" />
+        {/* Strengths and Risks section */}
+        {((strengths && strengths.length > 0) || (risks && risks.length > 0)) && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+            {strengths && strengths.length > 0 && <StrengthsCard strengths={strengths} />}
+            {risks && risks.length > 0 && <RisksCard risks={risks} />}
+          </div>
+        )}
 
         {/* Action buttons */}
-        <div className="flex gap-4 pt-4">
+        <div className="grid grid-cols-2 gap-3 pt-2">
+          <Button variant="destructive" size="sm" onClick={() => onReject?.(basicInfo.candidateId)}>
+            <XCircle className="h-4 w-4 mr-1" />
+            Reject
+          </Button>
           <Button
-            className="flex-1 bg-info hover:bg-info/90 text-info-foreground"
+            size="sm"
+            className="bg-info hover:bg-info/90 text-info-foreground"
             onClick={() => onMoveToInterview?.(basicInfo.candidateId)}
           >
-            <CheckCircle className="h-4 w-4 mr-2" />
+            <CheckCircle className="h-4 w-4 mr-1" />
             Move to Interview
-          </Button>
-          <Button variant="outline" onClick={() => onViewResume?.(resumeUrl)}>
-            View Full Resume
-          </Button>
-          <Button variant="destructive" onClick={() => onReject?.(basicInfo.candidateId)}>
-            <XCircle className="h-4 w-4 mr-2" />
-            Reject
           </Button>
         </div>
       </DialogContent>
