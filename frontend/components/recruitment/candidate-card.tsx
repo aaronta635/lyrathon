@@ -1,7 +1,6 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
-import { MapPin } from "lucide-react"
 import { SkillBadge } from "./skill-badge"
 import type { CandidateBasicInfo, MatchScore } from "@/lib/types"
 
@@ -10,10 +9,12 @@ interface CandidateCardProps {
   matchScore: MatchScore
   topSkills: string[]
   engineeringType?: string
+  availability?: string
+  expectedSalary?: number
   onCardClick?: (candidateId: string) => void
 }
 
-export function CandidateCard({ candidateInfo, matchScore, topSkills, engineeringType, onCardClick }: CandidateCardProps) {
+export function CandidateCard({ candidateInfo, matchScore, topSkills, engineeringType, expectedSalary, onCardClick }: CandidateCardProps) {
   const getScoreBgColor = (score: number) => {
     if (score >= 85) return "bg-success"
     if (score >= 70) return "bg-warning"
@@ -22,47 +23,49 @@ export function CandidateCard({ candidateInfo, matchScore, topSkills, engineerin
 
   const getEngTypeColor = (type: string) => {
     switch (type) {
-      case "Full-Stack": return "bg-primary/10 text-primary"
-      case "Frontend": return "bg-info/10 text-info"
-      case "Backend": return "bg-success/10 text-success"
-      case "DevOps": return "bg-warning/10 text-warning"
-      default: return "bg-muted text-muted-foreground"
+      case "Full-Stack": return "text-primary border-primary/30"
+      case "Frontend": return "text-info border-info/30"
+      case "Backend": return "text-success border-success/30"
+      case "DevOps": return "text-accent border-accent/30"
+      default: return "text-muted-foreground border-border"
     }
   }
 
+  const formatSalary = (salary: number) => `$${Math.round(salary / 1000)}k`
+
   return (
     <Card
-      className="p-3 hover:shadow-lg transition-all cursor-pointer hover:border-primary"
+      className="p-5 bg-card transition-all cursor-pointer border-0"
+      style={{ 
+        boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)',
+      }}
+      onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08)'}
+      onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)'}
       onClick={() => onCardClick?.(candidateInfo.candidateId)}
     >
-      {/* Header: Name + Score */}
-      <div className="flex items-center justify-between mb-1">
-        <h3 className="text-sm font-semibold text-foreground truncate flex-1 mr-2">{candidateInfo.fullName}</h3>
-        <span className={`px-2 py-0.5 rounded text-sm font-bold text-white ${getScoreBgColor(matchScore.overallScore)}`}>
+      {/* Name + Score */}
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <h3 className="text-base font-semibold text-foreground leading-tight">{candidateInfo.fullName}</h3>
+        <span className={`px-2 py-1 rounded text-xs font-semibold text-white shrink-0 ${getScoreBgColor(matchScore.overallScore)}`}>
           {matchScore.overallScore}%
         </span>
       </div>
 
+      {/* Location · Experience · Salary */}
+      <p className="text-sm text-muted-foreground mb-4">
+        {candidateInfo.location.split(",")[0]} · {candidateInfo.yearsOfExperience}y{expectedSalary ? ` · ${formatSalary(expectedSalary)}` : ""}
+      </p>
+
       {/* Engineering type badge */}
       {engineeringType && (
-        <span className={`inline-block text-[10px] font-medium px-1.5 py-0.5 rounded mb-1 ${getEngTypeColor(engineeringType)}`}>
+        <span className={`inline-block text-xs font-medium px-2.5 py-1 rounded border bg-transparent mb-4 ${getEngTypeColor(engineeringType)}`}>
           {engineeringType}
         </span>
       )}
 
-      {/* Location + Experience */}
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <div className="flex items-center">
-          <MapPin className="h-3 w-3 mr-0.5" />
-          <span>{candidateInfo.location}</span>
-        </div>
-        <span>•</span>
-        <span>{candidateInfo.yearsOfExperience}y exp</span>
-      </div>
-
       {/* Skills */}
-      <div className="flex flex-wrap gap-0.5 mt-1.5">
-        {topSkills.slice(0, 3).map((skillName, index) => (
+      <div className="flex flex-wrap gap-2">
+        {topSkills.slice(0, 2).map((skillName, index) => (
           <SkillBadge 
             key={skillName} 
             skillName={skillName} 

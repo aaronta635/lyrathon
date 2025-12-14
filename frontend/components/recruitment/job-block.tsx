@@ -14,26 +14,29 @@ interface JobBlockProps {
 
 export function JobBlock({ jobInfo, metrics, allJobs, onJobChange, onJobInfoUpdate, className = "" }: JobBlockProps) {
   return (
-    <Card className={`p-6 mb-6 ${className}`}>
+    <Card 
+      className={`p-8 mb-8 border-0 ${className}`}
+      style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)' }}
+    >
       {/* Top row: Job title + metrics */}
-      <div className="flex items-start justify-between mb-2">
+      <div className="flex items-start justify-between mb-4">
         <JobTitle 
           selectedJobId={jobInfo.jobId} 
           jobs={allJobs} 
           onJobChange={onJobChange} 
         />
-        <div className="flex items-center gap-6 text-sm">
+        <div className="flex items-center gap-8">
           <div className="text-center">
-            <p className="text-2xl font-bold text-foreground">{metrics.totalCandidates}</p>
-            <p className="text-xs text-muted-foreground">Candidates</p>
+            <p className="text-3xl font-semibold text-foreground">{metrics.totalCandidates}</p>
+            <p className="text-sm text-muted-foreground">Candidates</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-success">{metrics.averageMatchScore}%</p>
-            <p className="text-xs text-muted-foreground">Avg Match</p>
+            <p className="text-3xl font-semibold text-success">{metrics.averageMatchScore}%</p>
+            <p className="text-sm text-muted-foreground">Avg Match</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-info">{metrics.activeInterviews}</p>
-            <p className="text-xs text-muted-foreground">Interviews</p>
+            <p className="text-3xl font-semibold text-primary">{metrics.activeInterviews}</p>
+            <p className="text-sm text-muted-foreground">Interviews</p>
           </div>
         </div>
       </div>
