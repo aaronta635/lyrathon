@@ -34,7 +34,7 @@ export function CandidateDetailModal({
 }: CandidateDetailModalProps) {
   if (!candidateProfile) return null
 
-  const { basicInfo, matchScore, skills, projects, hiringRecommendation, engineerSummary, recommendations, strengths, risks, resumeUrl, linkedinUrl } = candidateProfile
+  const { basicInfo, matchScore, skills, projects, hiringRecommendation, justification, engineerSummary, recommendations, strengths, risks, resumeUrl, linkedinUrl } = candidateProfile
 
   const isSkillMatched = (skillName: string) => {
     if (jobRequiredSkills.length === 0) return true
@@ -113,7 +113,7 @@ export function CandidateDetailModal({
 
         {/* Content */}
         <div className="p-5 space-y-5">
-          {/* Skills immediately after header */}
+          {/* Skills */}
           <div>
             <h3 className="text-sm font-semibold text-foreground mb-2">Skills</h3>
             <div className="flex flex-wrap gap-2">
@@ -128,7 +128,7 @@ export function CandidateDetailModal({
             </div>
           </div>
 
-          {/* Hiring Recommendation - priority block */}
+          {/* Hiring Recommendation - priority block (with justification merged) */}
           <div 
             className="rounded-lg border-0"
             style={{ borderLeft: '4px solid #4ECDC4', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
@@ -139,7 +139,19 @@ export function CandidateDetailModal({
                 <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Recommendation</h3>
               </div>
               <p className="text-sm text-foreground leading-relaxed">
-                {hiringRecommendation}
+                {justification && justification.trim() ? (
+                  <>
+                    {justification}
+                    {hiringRecommendation && hiringRecommendation.trim() && (
+                      <>
+                        <br /><br />
+                        {hiringRecommendation}
+                      </>
+                    )}
+                  </>
+                ) : (
+                  hiringRecommendation
+                )}
               </p>
             </div>
           </div>
@@ -167,9 +179,9 @@ export function CandidateDetailModal({
             </div>
           ) : null}
 
-          {/* Hiring decision points */}
+          {/* Recommendations */}
           {recommendations && recommendations.length > 0 && (
-            <RecommendationsCard recommendations={recommendations} />
+            <RecommendationsCard recommendations={recommendations.slice(0, 3)} />
           )}
 
           {/* Action buttons */}

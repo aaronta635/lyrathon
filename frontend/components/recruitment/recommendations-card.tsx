@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { CheckCircle2, AlertTriangle, XCircle } from "lucide-react"
 
 interface RecommendationsCardProps {
@@ -10,16 +10,16 @@ interface RecommendationsCardProps {
 export function RecommendationsCard({ recommendations }: RecommendationsCardProps) {
   if (recommendations.length === 0) return null
 
+  // Limit to 3 recommendations
+  const displayRecommendations = recommendations.slice(0, 3)
+
   return (
     <Card 
       className="border-0 rounded-xl overflow-hidden"
       style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.08)' }}
     >
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base font-semibold">Hiring Decision Points</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        {recommendations.map((rec, index) => {
+      <CardContent className="space-y-2 pt-6">
+        {displayRecommendations.map((rec, index) => {
           const icon = rec.toLowerCase().includes("benefit") || rec.toLowerCase().includes("fit")
             ? <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
             : rec.toLowerCase().includes("risk") || rec.toLowerCase().includes("gap")

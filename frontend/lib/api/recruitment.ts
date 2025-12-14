@@ -46,7 +46,19 @@ export async function getCandidates(): Promise<CandidateListItem[]> {
   
   try {
     const applications = await getApplications()
-    return applications.map(transformDecisionCardToCandidate)
+    console.log('Fetched applications from API:', applications)
+    
+    // Filter out applications that are still processing
+    const readyApplications = applications.filter((app: any) => 
+      app.status === 'ready' || app.status === 'awaiting_media'
+    )
+    
+    console.log('Ready applications:', readyApplications)
+    
+    const candidates = readyApplications.map(transformDecisionCardToCandidate)
+    console.log('Transformed candidates:', candidates)
+    
+    return candidates
   } catch (error) {
     console.error('Error fetching candidates:', error)
     // Return mock candidates as fallback

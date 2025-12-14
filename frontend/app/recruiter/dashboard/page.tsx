@@ -273,6 +273,7 @@ export default function RecruiterDashboard() {
   const [sortBy, setSortBy] = useState("score-desc")
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null)
   const [selectedCandidateProfile, setSelectedCandidateProfile] = useState<CandidateFullProfile | null>(null)
+  const [selectedCandidateListItem, setSelectedCandidateListItem] = useState<CandidateListItem | null>(null)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -286,6 +287,12 @@ export default function RecruiterDashboard() {
           getDashboardMetrics(),
           getCandidates(),
         ])
+        console.log('Dashboard data loaded:', {
+          jobs: jobsData.length,
+          metrics: metricsData,
+          candidates: candidatesData.length,
+          candidatesData,
+        })
         setJobs(jobsData)
         setMetrics(metricsData)
         setCandidates(candidatesData)
@@ -305,11 +312,30 @@ export default function RecruiterDashboard() {
   // Fetch candidate profile when selected
   useEffect(() => {
     if (selectedCandidateId) {
-      getCandidateProfile(selectedCandidateId).then(setSelectedCandidateProfile)
+      // Find the candidate from the list to get justification and recommendations
+      const candidateFromList = candidates.find(c => c.candidateInfo.candidateId === selectedCandidateId)
+      if (candidateFromList) {
+        setSelectedCandidateListItem(candidateFromList)
+      }
+      
+      // Fetch full profile
+      getCandidateProfile(selectedCandidateId).then(profile => {
+        if (profile && candidateFromList) {
+          // Merge justification and recommendations from the list item
+          setSelectedCandidateProfile({
+            ...profile,
+            justification: candidateFromList.justification || profile.justification,
+            recommendations: candidateFromList.recommendations || profile.recommendations,
+          })
+        } else {
+          setSelectedCandidateProfile(profile)
+        }
+      })
     } else {
       setSelectedCandidateProfile(null)
+      setSelectedCandidateListItem(null)
     }
-  }, [selectedCandidateId])
+  }, [selectedCandidateId, candidates])
 
   const allJobsDefault: JobPostingInfo = {
     jobId: "all",
@@ -327,34 +353,36 @@ export default function RecruiterDashboard() {
   }
   
   // Filter candidates by location and skill match, then sort
+  // For now, show ALL candidates regardless of location/skills - filtering can be added later
+  console.log('Filtering candidates:', {
+    totalCandidates: candidates.length,
+    currentJob: currentJob,
+    candidates: candidates,
+  })
+  
+  // Show all candidates - no filtering for now
   const filteredAndSortedCandidates = candidates
-    .filter(candidate => {
-      // Location filter: "All Locations" shows everyone, otherwise match job location or Remote
-      const jobLocation = currentJob.location
-      const candidateLocation = candidate.candidateInfo.location.split(",")[0].trim()
-      const locationMatch = jobLocation === "All Locations" || jobLocation === "Remote" || candidateLocation === jobLocation || candidateLocation === "Remote"
-      
-      // Skill match: if no skills required or candidate has at least one required skill
-      const hasSkillMatch = currentJob.requiredSkills.length === 0 || currentJob.requiredSkills.some(skill => 
-        candidate.topSkills.some(s => s.toLowerCase().includes(skill.toLowerCase()))
-      )
-      
-      return locationMatch && hasSkillMatch
-    })
     .map(candidate => {
       // Recalculate match score based on skill overlap
+      const candidateSkills = candidate.topSkills || []
       const skillOverlap = currentJob.requiredSkills.length > 0 
         ? currentJob.requiredSkills.filter(skill =>
-            candidate.topSkills.some(s => s.toLowerCase().includes(skill.toLowerCase()))
+            candidateSkills.some(s => 
+              s && skill && (
+                s.toLowerCase().includes(skill.toLowerCase()) || 
+                skill.toLowerCase().includes(s.toLowerCase())
+              )
+            )
           ).length
-        : candidate.topSkills.length
+        : candidateSkills.length
       const skillMatchPercent = currentJob.requiredSkills.length > 0
         ? Math.round((skillOverlap / currentJob.requiredSkills.length) * 100)
         : 100
       
+      const baseScore = candidate.matchScore?.overallScore || 75
       return {
         ...candidate,
-        dynamicScore: Math.round((candidate.matchScore.overallScore + skillMatchPercent) / 2)
+        dynamicScore: Math.round((baseScore + skillMatchPercent) / 2)
       }
     })
     .sort((a, b) => {

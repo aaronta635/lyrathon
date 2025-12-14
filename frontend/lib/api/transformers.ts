@@ -97,6 +97,8 @@ export function transformDecisionCardToCandidate(card: BackendDecisionCard): Can
       fitLevel,
     },
     topSkills,
+    justification: card.justification,
+    recommendations: card.recommendations?.slice(0, 3), // Limit to 3 recommendations
   }
 }
 
@@ -158,13 +160,14 @@ export function transformApplicationToFullProfile(app: BackendApplication): Cand
       activityTrend: 'stable' as const,
     },
     hiringRecommendation: githubData.justification || 'Candidate shows strong potential.',
+    justification: githubData.justification, // Full justification text
     engineerSummary: {
       inferred_seniority: githubData.inferred_seniority || 'mid-level',
       core_strengths: githubData.core_strengths || [],
       working_style: 'independent',
       collaboration_style: githubData.collaboration_style || 'collaborative',
     },
-    recommendations: githubData.recommendations || [],
+    recommendations: (githubData.recommendations || []).slice(0, 3), // Limit to 3 recommendations
     strengths: githubData.core_strengths || [],
     risks: resumeData.risk_flags || [],
     resumeUrl: '', // Backend doesn't expose resume URL directly

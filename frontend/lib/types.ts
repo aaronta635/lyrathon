@@ -52,6 +52,7 @@ export interface CandidateFullProfile {
   githubMetrics?: GitHubMetrics
   matchScore: MatchScore
   hiringRecommendation: string // From GitHub analyzer
+  justification?: string // Full justification text
   engineerSummary?: EngineerSummary // Personality from GitHub analyzer
   recommendations?: string[] // Hiring recommendations
   strengths?: string[] // Candidate strengths
@@ -95,4 +96,6 @@ export interface CandidateListItem {
   engineeringType: "Full-Stack" | "Frontend" | "Backend"
   matchScore: MatchScore
   topSkills: string[]
+  justification?: string
+  recommendations?: string[]
 }
