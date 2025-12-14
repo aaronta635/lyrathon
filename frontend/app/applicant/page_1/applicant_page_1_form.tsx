@@ -14,9 +14,8 @@ import { ArrowRight } from "lucide-react"
 export interface ApplicantFormData {
   fullName: string
   email: string
-  phoneNumber: string
   resumeFile: File | null
-  githubProjectUrls: string[]
+  githubUrl: string
   jobArea: string
 }
 
@@ -24,9 +23,8 @@ export function ApplicantPage1Form() {
   const [formData, setFormData] = useState<ApplicantFormData>({
     fullName: "",
     email: "",
-    phoneNumber: "",
     resumeFile: null,
-    githubProjectUrls: [""],
+    githubUrl: "",
     jobArea: "",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -65,12 +63,12 @@ export function ApplicantPage1Form() {
     }
   }
 
-  const handleGithubProjectsChange = (urls: string[]) => {
-    setFormData((prev) => ({ ...prev, githubProjectUrls: urls }))
-    if (formErrors.githubProjectUrls) {
+  const handleGithubUrlChange = (url: string) => {
+    setFormData((prev) => ({ ...prev, githubUrl: url }))
+    if (formErrors.githubUrl) {
       setFormErrors((prev) => {
         const newErrors = { ...prev }
-        delete newErrors.githubProjectUrls
+        delete newErrors.githubUrl
         return newErrors
       })
     }
@@ -89,10 +87,6 @@ export function ApplicantPage1Form() {
       errors.email = "Please enter a valid email address"
     }
 
-    if (!formData.phoneNumber.trim()) {
-      errors.phoneNumber = "Phone number is required"
-    }
-
     if (!formData.jobArea) {
       errors.jobArea = "Please select a job area"
     }
@@ -101,9 +95,10 @@ export function ApplicantPage1Form() {
       errors.resumeFile = "Please upload your resume"
     }
 
-    const validGithubUrls = formData.githubProjectUrls.filter((url) => url.trim() !== "")
-    if (validGithubUrls.length === 0) {
-      errors.githubProjectUrls = "Please add at least one GitHub project URL"
+    if (!formData.githubUrl.trim()) {
+      errors.githubUrl = "GitHub URL is required"
+    } else if (!/^https?:\/\/github\.com\/.+/.test(formData.githubUrl.trim())) {
+      errors.githubUrl = "Please enter a valid GitHub URL (e.g., https://github.com/username)"
     }
 
     setFormErrors(errors)
@@ -123,9 +118,6 @@ export function ApplicantPage1Form() {
       // Import API function
       const { createApplication } = await import('@/lib/api/applications')
       
-      // Get the first GitHub URL (backend expects single URL)
-      const githubUrl = formData.githubProjectUrls.find(url => url.trim() !== '') || ''
-      
       // Map jobArea to focus (fullstack, frontend, backend)
       const focusMap: Record<string, 'fullstack' | 'frontend' | 'backend'> = {
         'fullstack': 'fullstack',
@@ -138,7 +130,7 @@ export function ApplicantPage1Form() {
       const response = await createApplication({
         name: formData.fullName,
         email: formData.email,
-        github_url: githubUrl,
+        github_url: formData.githubUrl.trim(),
         focus: focus,
         resume: formData.resumeFile!,
       })
@@ -167,9 +159,8 @@ export function ApplicantPage1Form() {
     setFormData({
       fullName: "",
       email: "",
-      phoneNumber: "",
       resumeFile: null,
-      githubProjectUrls: [""],
+      githubUrl: "",
       jobArea: "",
     })
     setFormErrors({})
@@ -187,7 +178,6 @@ export function ApplicantPage1Form() {
             <ApplicantPage1PersonalInfo
               fullName={formData.fullName}
               email={formData.email}
-              phoneNumber={formData.phoneNumber}
               onChange={handlePersonalInfoChange}
               errors={formErrors}
             />
@@ -224,14 +214,14 @@ export function ApplicantPage1Form() {
 
         <Card className="border-2 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader>
-            <CardTitle className="text-navy-blue">GitHub Projects</CardTitle>
-            <CardDescription>Share links to your best work</CardDescription>
+            <CardTitle className="text-navy-blue">GitHub Profile</CardTitle>
+            <CardDescription>Share your GitHub profile or repository URL</CardDescription>
           </CardHeader>
           <CardContent>
             <ApplicantPage1GithubProjects
-              projectUrls={formData.githubProjectUrls}
-              onChange={handleGithubProjectsChange}
-              error={formErrors.githubProjectUrls}
+              githubUrl={formData.githubUrl}
+              onChange={handleGithubUrlChange}
+              error={formErrors.githubUrl}
             />
           </CardContent>
         </Card>
@@ -245,9 +235,8 @@ export function ApplicantPage1Form() {
               setFormData({
                 fullName: "",
                 email: "",
-                phoneNumber: "",
                 resumeFile: null,
-                githubProjectUrls: [""],
+                githubUrl: "",
                 jobArea: "",
               })
               setFormErrors({})

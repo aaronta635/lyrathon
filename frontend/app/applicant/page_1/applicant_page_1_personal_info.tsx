@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label"
 interface ApplicantPage1PersonalInfoProps {
   fullName: string
   email: string
-  phoneNumber: string
   onChange: (field: string, value: string) => void
   errors: Record<string, string>
 }
@@ -14,7 +13,6 @@ interface ApplicantPage1PersonalInfoProps {
 export function ApplicantPage1PersonalInfo({
   fullName,
   email,
-  phoneNumber,
   onChange,
   errors,
 }: ApplicantPage1PersonalInfoProps) {
@@ -48,21 +46,6 @@ export function ApplicantPage1PersonalInfo({
           className={`border-2 ${errors.email ? "border-red-500" : "border-light-gray focus:border-peach-orange"}`}
         />
         {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="phoneNumber" className="text-navy-blue font-medium">
-          Phone Number *
-        </Label>
-        <Input
-          id="phoneNumber"
-          type="tel"
-          placeholder="+1 (555) 123-4567"
-          value={phoneNumber}
-          onChange={(e) => onChange("phoneNumber", e.target.value)}
-          className={`border-2 ${errors.phoneNumber ? "border-red-500" : "border-light-gray focus:border-peach-orange"}`}
-        />
-        {errors.phoneNumber && <p className="text-sm text-red-500">{errors.phoneNumber}</p>}
       </div>
     </div>
   )

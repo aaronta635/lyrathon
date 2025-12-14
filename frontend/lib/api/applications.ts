@@ -34,17 +34,25 @@ export async function createApplication(
   formData.append('focus', data.focus)
   formData.append('resume', data.resume)
 
-  const response = await fetch(`${API_BASE_URL}/applications/`, {
-    method: 'POST',
-    body: formData,
-  })
+  try {
+    const response = await fetch(`${API_BASE_URL}/applications/`, {
+      method: 'POST',
+      body: formData,
+      // Don't set Content-Type header - browser will set it with boundary for FormData
+    })
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: 'Failed to create application' }))
-    throw new Error(error.detail || `HTTP ${response.status}: Failed to create application`)
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Failed to create application' }))
+      throw new Error(error.detail || `HTTP ${response.status}: Failed to create application`)
+    }
+
+    return response.json()
+  } catch (error) {
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new Error('Network error: Could not connect to server. Please check your internet connection.')
+    }
+    throw error
   }
-
-  return response.json()
 }
 
 /**
