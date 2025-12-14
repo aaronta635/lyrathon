@@ -46,6 +46,8 @@ export interface CandidateFullProfile {
   matchScore: MatchScore
   professionalSummary: string
   resumeUrl: string
+  strengths?: string[]
+  risks?: string[]
 }
 
 export interface JobPostingInfo {
