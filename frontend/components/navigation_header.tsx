@@ -20,7 +20,7 @@ export default function NavigationHeader({ currentMode }: NavigationHeaderProps)
             <div className="h-8 w-8 rounded-lg bg-[#00756a] flex items-center justify-center">
               <Sparkles className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-white">HireFlow</span>
+            <span className="text-xl font-bold text-white">Talent Pipeline</span>
           </Link>
 
           {/* Profile/Mode Switcher */}

@@ -30,7 +30,12 @@ interface JobDetailsProps {
 }
 
 const locationOptions = ["All Locations", "Sydney", "Melbourne", "Brisbane", "Perth", "Remote"]
-const employmentTypeOptions = ["all", "full-time", "part-time", "contract"]
+const employmentTypeOptions = [
+  { value: "all", label: "Any Availability" },
+  { value: "full-time", label: "Full-time" },
+  { value: "part-time", label: "Part-time" },
+  { value: "contract", label: "Contract" },
+]
 const salaryRangeOptions = [
   { label: "Any Salary", min: 0, max: 999999 },
   { label: "$80k-$100k", min: 80000, max: 100000 },
@@ -76,7 +81,7 @@ export function JobDetails({
       {/* Location, Employment Type, Salary as dropdowns */}
       <div className="flex items-center gap-3 text-sm mb-4">
         <Select value={location} onValueChange={onLocationChange}>
-          <SelectTrigger className="w-auto h-8 border-none shadow-none p-0 text-muted-foreground hover:text-foreground">
+          <SelectTrigger className="w-auto h-8 border-none shadow-none p-0 text-secondary hover:text-secondary/80 font-medium [&>svg]:text-secondary">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -89,12 +94,14 @@ export function JobDetails({
         <span className="text-muted-foreground">•</span>
 
         <Select value={employmentType} onValueChange={onEmploymentTypeChange}>
-          <SelectTrigger className="w-auto h-8 border-none shadow-none p-0 text-muted-foreground hover:text-foreground capitalize">
-            <SelectValue />
+          <SelectTrigger className="w-auto h-8 border-none shadow-none p-0 text-secondary hover:text-secondary/80 font-medium [&>svg]:text-secondary">
+            <SelectValue>
+              {employmentTypeOptions.find(t => t.value === employmentType)?.label || employmentType}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {employmentTypeOptions.map((type) => (
-              <SelectItem key={type} value={type} className="capitalize">{type}</SelectItem>
+              <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -108,7 +115,7 @@ export function JobDetails({
             onSalaryRangeChange?.({ minSalary: min, maxSalary: max, currency: "AUD" })
           }}
         >
-          <SelectTrigger className="w-auto h-8 border-none shadow-none p-0 text-muted-foreground hover:text-foreground">
+          <SelectTrigger className="w-auto h-8 border-none shadow-none p-0 text-secondary hover:text-secondary/80 font-medium [&>svg]:text-secondary">
             <SelectValue>{formattedSalaryRange}</SelectValue>
           </SelectTrigger>
           <SelectContent>
@@ -146,20 +153,18 @@ export function JobDetails({
               className="h-7 w-32 text-sm"
               autoFocus
             />
-            <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={handleAddSkill}>
+            <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-primary hover:text-primary/80 hover:bg-primary/5" onClick={handleAddSkill}>
               <Plus className="h-4 w-4" />
             </Button>
           </div>
         ) : (
-          <Button 
-            size="sm" 
-            variant="outline" 
-            className="h-7 text-xs gap-1"
+          <button 
+            className="flex items-center gap-1 text-sm font-semibold text-accent hover:text-accent/80 transition-colors"
             onClick={() => setIsAddingSkill(true)}
           >
-            <Plus className="h-3 w-3" />
+            <Plus className="h-4 w-4" />
             Add Skill
-          </Button>
+          </button>
         )}
       </div>
     </div>

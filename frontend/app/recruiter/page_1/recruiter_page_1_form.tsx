@@ -4,7 +4,6 @@ import type React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import RecruiterPage1Header from "./recruiter_page_1_header"
 import RecruiterPage1JobDetails from "./recruiter_page_1_job_details"
 import RecruiterPage1EngineeringType from "./recruiter_page_1_engineering_type"
 import RecruiterPage1Requirements from "./recruiter_page_1_requirements"
@@ -87,8 +86,6 @@ export default function RecruiterPage1Form() {
 
   return (
     <div className="container max-w-4xl mx-auto px-6 py-8">
-      <RecruiterPage1Header />
-
       <form onSubmit={handleSubmit} className="space-y-6">
         <RecruiterPage1JobDetails formData={formData} formErrors={formErrors} updateFormField={updateFormField} />
 

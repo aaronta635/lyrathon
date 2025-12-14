@@ -7,26 +7,39 @@ export default function HomePage() {
     <div className="min-h-screen bg-background">
       <NavigationHeader currentMode="home" />
 
-      {/* Header */}
-      <header className="border-b border-border bg-navy">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-orange flex items-center justify-center">
-                <Sparkles className="h-5 w-5 text-navy" />
-              </div>
-              <span className="text-xl font-bold text-white">HireFlow</span>
+      {/* Header with marble texture */}
+      <header 
+        className="relative z-10 border-b border-border"
+        style={{ 
+          backgroundImage: `linear-gradient(90deg, rgba(26,90,82,0.3) 0%, rgba(0,0,0,0.2) 100%), url('/textures/marble-teal.jpg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: '20% center',
+        }}
+      >
+        <div className="container mx-auto px-4 py-5 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="p-2.5 bg-white/15 rounded-xl backdrop-blur-sm" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+              <svg className="h-6 w-6 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-xl font-semibold text-white" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>Talent Pipeline</h1>
+              <p className="text-sm text-white/80" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>Candidate Management System</p>
             </div>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-navy to-navy/95 text-white py-20">
+      <section className="bg-gradient-to-b from-[#1a5a52] to-[#004038] text-white py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl md:text-6xl font-bold mb-6 text-balance">Automate Your Hiring Process</h1>
-            <p className="text-xl md:text-2xl text-peach mb-12 text-pretty">
+            <p className="text-xl md:text-2xl text-white/90 mb-12 text-pretty">
               Streamline recruitment and applications with our intelligent platform. Save time, reduce complexity, and
               make hiring easier for everyone.
             </p>
@@ -37,14 +50,14 @@ export default function HomePage() {
               <Link href="/applicant/page_1">
                 <div className="group bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 hover:bg-white/15 hover:scale-105 transition-all duration-300 cursor-pointer">
                   <div className="flex flex-col items-center gap-4">
-                    <div className="h-16 w-16 rounded-full bg-orange flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <FileText className="h-8 w-8 text-navy" />
+                    <div className="h-16 w-16 rounded-full bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <FileText className="h-8 w-8 text-white" />
                     </div>
                     <h2 className="text-2xl font-bold">I'm an Applicant</h2>
-                    <p className="text-gray-light text-balance">
+                    <p className="text-white/80 text-balance">
                       Submit your application with ease. Upload your resume, showcase projects, and verify your email.
                     </p>
-                    <div className="flex items-center gap-2 text-orange font-semibold group-hover:gap-3 transition-all">
+                    <div className="flex items-center gap-2 text-white font-semibold group-hover:gap-3 transition-all">
                       Start Application <ArrowRight className="h-5 w-5" />
                     </div>
                   </div>
@@ -55,14 +68,14 @@ export default function HomePage() {
               <Link href="/recruiter/dashboard">
                 <div className="group bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 hover:bg-white/15 hover:scale-105 transition-all duration-300 cursor-pointer">
                   <div className="flex flex-col items-center gap-4">
-                    <div className="h-16 w-16 rounded-full bg-peach flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <Users className="h-8 w-8 text-navy" />
+                    <div className="h-16 w-16 rounded-full bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <Users className="h-8 w-8 text-white" />
                     </div>
                     <h2 className="text-2xl font-bold">I'm a Recruiter</h2>
-                    <p className="text-gray-light text-balance">
+                    <p className="text-white/80 text-balance">
                       Manage applications, review candidates, and streamline your hiring workflow efficiently.
                     </p>
-                    <div className="flex items-center gap-2 text-peach font-semibold group-hover:gap-3 transition-all">
+                    <div className="flex items-center gap-2 text-white font-semibold group-hover:gap-3 transition-all">
                       Access Dashboard <ArrowRight className="h-5 w-5" />
                     </div>
                   </div>
@@ -77,7 +90,7 @@ export default function HomePage() {
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-4xl font-bold text-center mb-4 text-navy">Why Choose HireFlow?</h2>
+            <h2 className="text-4xl font-bold text-center mb-4 text-foreground">Why Choose Talent Pipeline?</h2>
             <p className="text-center text-muted-foreground mb-12 text-lg">
               Built to make hiring seamless for both recruiters and applicants
             </p>
@@ -85,8 +98,8 @@ export default function HomePage() {
             <div className="grid md:grid-cols-3 gap-8">
               {/* Feature 1 */}
               <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-shadow">
-                <div className="h-12 w-12 rounded-lg bg-orange/10 flex items-center justify-center mb-4">
-                  <Clock className="h-6 w-6 text-orange" />
+                <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <Clock className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="text-xl font-bold mb-2 text-navy">Save Time</h3>
                 <p className="text-muted-foreground">
@@ -99,7 +112,7 @@ export default function HomePage() {
                 <div className="h-12 w-12 rounded-lg bg-peach/20 flex items-center justify-center mb-4">
                   <Shield className="h-6 w-6 text-orange" />
                 </div>
-                <h3 className="text-xl font-bold mb-2 text-navy">Secure & Reliable</h3>
+                <h3 className="text-xl font-bold mb-2 text-foreground">Secure & Reliable</h3>
                 <p className="text-muted-foreground">
                   Email verification and secure data handling ensure every application is legitimate and protected.
                 </p>
@@ -107,8 +120,8 @@ export default function HomePage() {
 
               {/* Feature 3 */}
               <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-shadow">
-                <div className="h-12 w-12 rounded-lg bg-orange/10 flex items-center justify-center mb-4">
-                  <Sparkles className="h-6 w-6 text-orange" />
+                <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <Sparkles className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="text-xl font-bold mb-2 text-navy">Smart Processing</h3>
                 <p className="text-muted-foreground">
@@ -121,14 +134,14 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-navy text-white">
+      <section className="py-16 bg-gradient-to-b from-[#1a5a52] to-[#004038] text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-balance">Ready to Transform Your Hiring?</h2>
-            <p className="text-xl text-peach mb-8">Join hundreds of organizations making hiring simpler and faster</p>
+            <p className="text-xl text-white/90 mb-8">Join hundreds of organizations making hiring simpler and faster</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/applicant/page_1">
-                <button className="bg-orange hover:bg-orange/90 text-navy px-8 py-3 rounded-lg font-semibold transition-colors">
+                <button className="bg-white hover:bg-white/90 text-[#004038] px-8 py-3 rounded-lg font-semibold transition-colors">
                   Apply Now
                 </button>
               </Link>
@@ -146,7 +159,7 @@ export default function HomePage() {
       <footer className="py-8 border-t border-border bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center text-muted-foreground">
-            <p>© 2025 HireFlow. Making hiring easier for everyone.</p>
+            <p>© 2025 Talent Pipeline. Making hiring easier for everyone.</p>
           </div>
         </div>
       </footer>

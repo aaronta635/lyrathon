@@ -38,16 +38,26 @@ export interface MatchScore {
   fitLevel: "strong" | "moderate" | "weak"
 }
 
+export interface EngineerSummary {
+  inferred_seniority: string
+  core_strengths: string[]
+  working_style: string
+  collaboration_style: string
+}
+
 export interface CandidateFullProfile {
   basicInfo: CandidateBasicInfo
   skills: SkillInfo[]
   projects: ProjectInfo[]
   githubMetrics?: GitHubMetrics
   matchScore: MatchScore
-  professionalSummary: string
+  hiringRecommendation: string // From GitHub analyzer
+  engineerSummary?: EngineerSummary // Personality from GitHub analyzer
+  recommendations?: string[] // Hiring recommendations
+  strengths?: string[] // Candidate strengths
+  risks?: string[] // Candidate risks
   resumeUrl: string
-  strengths?: string[]
-  risks?: string[]
+  linkedinUrl?: string
 }
 
 export interface JobPostingInfo {
