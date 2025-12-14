@@ -1,5 +1,5 @@
 import os
-from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.cors import CORSMiddleware
 from app.config import settings
 
 def is_allowed_origin(origin: str, frontend_url: str) -> bool:
@@ -39,7 +39,7 @@ def add_middlewares(app):
         # This allows both the production frontend URL and any Vercel preview deployment
         app.add_middleware(
             CORSMiddleware,
-            allow_origin_func=lambda origin, state: is_allowed_origin(origin, frontend_url),
+            allow_origin_func=lambda origin: is_allowed_origin(origin, frontend_url),
             allow_credentials=True,
             allow_methods=['*'],
             allow_headers=['*']
