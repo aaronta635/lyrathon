@@ -20,7 +20,7 @@ def build_decision_card(application: Application) -> DecisionCardResponse:
     
     # Build the Decision Card
     return DecisionCardResponse(
-        id=application.id,
+        id=str(application.id),
         name=application.name,
         built=resume_data.get("built", []),  # AI extracted from resume
         # GitHub analyzer fields

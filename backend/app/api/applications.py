@@ -188,7 +188,7 @@ async def create_application(
     )
     
     return ApplicationCreateResponse(
-        id=application.id,
+        id=str(application.id),
         status=ApplicationStatus.PROCESSING,
         message="Application received. Processing resume..."
     )
@@ -299,5 +299,19 @@ async def get_application(
     if not application:
         raise HTTPException(status_code=404, detail="Application not found")
     
-    return application
+    # Convert to response model, ensuring ID is string
+    return ApplicationResponse(
+        id=str(application.id),
+        name=application.name,
+        email=application.email,
+        github_url=application.github_url,
+        video_url=application.video_url,
+        deploy_url=application.deploy_url,
+        can_view_without_login=application.can_view_without_login == "true" if application.can_view_without_login else None,
+        can_embed=application.can_embed == "true" if application.can_embed else None,
+        resume_data=application.resume_data,
+        github_data=application.github_data,
+        status=application.status,
+        created_at=application.created_at,
+    )
 
