@@ -2,6 +2,25 @@ import os
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 
+def is_allowed_origin(origin: str, frontend_url: str) -> bool:
+    """Check if origin is allowed, including Vercel preview deployments"""
+    if not origin:
+        return False
+    
+    # Always allow localhost for local development
+    if origin.startswith('http://localhost:') or origin.startswith('http://127.0.0.1:'):
+        return True
+    
+    # Allow exact frontend URL match
+    if origin == frontend_url:
+        return True
+    
+    # Allow all Vercel preview deployments (*.vercel.app)
+    if 'vercel.app' in origin and origin.startswith('https://'):
+        return True
+    
+    return False
+
 def add_middlewares(app):
     # Get frontend URL from environment or config (check both sources)
     frontend_url = os.getenv('FRONTEND_URL', '') or settings.frontend_url
@@ -16,18 +35,18 @@ def add_middlewares(app):
         origins = ['*']
         allow_credentials = False  # Can't use credentials with wildcard
     else:
-        # Production: restrict to frontend domain
-        origins = [frontend_url]
-        # Always allow localhost for local development/testing
-        # This won't affect production security since localhost can't be accessed from outside
-        origins.extend([
-            'http://localhost:3000',
-            'http://localhost:3001',
-            'http://127.0.0.1:3000',
-            'http://127.0.0.1:3001',
-        ])
-        allow_credentials = True
+        # Production: use custom origin validator to allow Vercel preview deployments
+        # This allows both the production frontend URL and any Vercel preview deployment
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origin_func=lambda origin, state: is_allowed_origin(origin, frontend_url),
+            allow_credentials=True,
+            allow_methods=['*'],
+            allow_headers=['*']
+        )
+        return  # Early return since middleware is already added
     
+    # For development mode (debug=True or no frontend_url)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
