@@ -1,0 +1,316 @@
+-- SQL script to update GitHub data for demo candidates in Supabase
+-- Run this in Supabase SQL Editor: https://app.supabase.com/project/[your-project]/sql/new
+
+-- Sarah Chen (90% confidence, Senior)
+UPDATE applications
+SET github_data = '{
+  "raw": {
+    "recommendations": {
+      "skill_development": [
+        "Continue expanding Next.js App Router expertise",
+        "Deepen knowledge in microservices architecture patterns"
+      ],
+      "github_improvements": [
+        "Maintain consistent commit frequency",
+        "Add more comprehensive test coverage",
+        "Document API endpoints more thoroughly"
+      ],
+      "project_suggestions": [
+        "Contribute to open-source React projects",
+        "Build a Next.js 14+ project showcasing App Router"
+      ]
+    },
+    "engineer_summary": {
+      "working_style": "highly collaborative",
+      "core_strengths": ["React", "Node.js", "TypeScript", "AWS"],
+      "inferred_seniority": "senior",
+      "collaboration_style": "highly collaborative"
+    },
+    "job_fit_analysis": {
+      "overall_fit": "strong",
+      "risk_factors": [],
+      "matched_requirements": ["React", "Node.js", "TypeScript", "AWS", "PostgreSQL"],
+      "missing_or_weak_areas": ["Next.js App Router"]
+    },
+    "hiring_recommendation": {
+      "decision": "Strong Hire",
+      "justification": "Sarah demonstrates exceptional fullstack capabilities with 7 years of production experience. Her React and Node.js expertise is well-documented through active GitHub contributions and verified project implementations. The candidate shows strong architectural thinking with microservices experience and cloud infrastructure knowledge. This is an ideal candidate for senior fullstack engineering roles.",
+      "confidence_level": "high",
+      "confidence_percentage": 90
+    }
+  },
+  "justification": "Sarah demonstrates exceptional fullstack capabilities with 7 years of production experience. Her React and Node.js expertise is well-documented through active GitHub contributions and verified project implementations. The candidate shows strong architectural thinking with microservices experience and cloud infrastructure knowledge. This is an ideal candidate for senior fullstack engineering roles.",
+  "core_strengths": ["React", "Node.js", "TypeScript", "AWS"],
+  "recommendations": [
+    "Excellent fit for senior fullstack roles requiring React expertise",
+    "Strong production experience with scalable architectures",
+    "Would benefit from pair programming on Next.js 14 features"
+  ],
+  "inferred_seniority": "senior",
+  "collaboration_style": "highly collaborative",
+  "confidence_percentage": 90
+}'::jsonb
+WHERE email = 'sarah.chen@demo.com';
+
+-- Marcus Rodriguez (80% confidence, Mid-level)
+UPDATE applications
+SET github_data = '{
+  "raw": {
+    "recommendations": {
+      "skill_development": [
+        "Gain experience in frontend technologies to become fullstack",
+        "Learn React or Vue.js for frontend development"
+      ],
+      "github_improvements": [
+        "Increase documentation in existing projects",
+        "Add more comprehensive API documentation",
+        "Engage in code reviews and team collaboration"
+      ],
+      "project_suggestions": [
+        "Build a fullstack application showcasing both backend and frontend skills",
+        "Contribute to Python/Django open-source projects"
+      ]
+    },
+    "engineer_summary": {
+      "working_style": "moderate collaboration",
+      "core_strengths": ["Python", "Django", "PostgreSQL"],
+      "inferred_seniority": "mid-level",
+      "collaboration_style": "moderate collaboration"
+    },
+    "job_fit_analysis": {
+      "overall_fit": "moderate",
+      "risk_factors": ["limited frontend experience", "no fullstack project work"],
+      "matched_requirements": ["PostgreSQL", "Backend architecture"],
+      "missing_or_weak_areas": ["React", "Node.js", "Frontend development"]
+    },
+    "hiring_recommendation": {
+      "decision": "Conditional Hire",
+      "justification": "Marcus shows solid backend engineering skills with proven experience in high-scale systems. His database optimization work demonstrates strong technical depth. However, the candidate has limited frontend experience which may limit growth opportunities in fullstack roles. Best suited for backend-focused positions where Python and Django expertise is valued.",
+      "confidence_level": "high",
+      "confidence_percentage": 80
+    }
+  },
+  "justification": "Marcus shows solid backend engineering skills with proven experience in high-scale systems. His database optimization work demonstrates strong technical depth. However, the candidate has limited frontend experience which may limit growth opportunities in fullstack roles. Best suited for backend-focused positions where Python and Django expertise is valued.",
+  "core_strengths": ["Python", "Django", "PostgreSQL"],
+  "recommendations": [
+    "Good fit for backend-heavy roles with Python/Django stack",
+    "Strong database optimization skills demonstrated",
+    "Could benefit from more frontend exposure for fullstack growth"
+  ],
+  "inferred_seniority": "mid-level",
+  "collaboration_style": "moderate collaboration",
+  "confidence_percentage": 80
+}'::jsonb
+WHERE email = 'marcus.r@demo.com';
+
+-- Emma Watson (85% confidence, Mid-level)
+UPDATE applications
+SET github_data = '{
+  "raw": {
+    "recommendations": {
+      "skill_development": [
+        "Gain experience in backend technologies to become fullstack",
+        "Learn Node.js or Python for backend development"
+      ],
+      "github_improvements": [
+        "Maintain consistent commit frequency",
+        "Add more comprehensive test coverage",
+        "Improve README documentation quality"
+      ],
+      "project_suggestions": [
+        "Build a fullstack application to showcase end-to-end skills",
+        "Contribute to React/TypeScript open-source projects"
+      ]
+    },
+    "engineer_summary": {
+      "working_style": "collaborative",
+      "core_strengths": ["React", "TypeScript", "GraphQL"],
+      "inferred_seniority": "mid-level",
+      "collaboration_style": "collaborative"
+    },
+    "job_fit_analysis": {
+      "overall_fit": "good",
+      "risk_factors": ["limited backend experience"],
+      "matched_requirements": ["React", "TypeScript"],
+      "missing_or_weak_areas": ["Node.js", "Backend development", "Fullstack experience"]
+    },
+    "hiring_recommendation": {
+      "decision": "Good Hire",
+      "justification": "Emma demonstrates strong frontend engineering capabilities with a focus on user experience and design systems. Her React and TypeScript skills are well-documented, and she shows good collaboration patterns. The candidate is well-suited for frontend roles but would need backend experience to transition to fullstack positions.",
+      "confidence_level": "high",
+      "confidence_percentage": 85
+    }
+  },
+  "justification": "Emma demonstrates strong frontend engineering capabilities with a focus on user experience and design systems. Her React and TypeScript skills are well-documented, and she shows good collaboration patterns. The candidate is well-suited for frontend roles but would need backend experience to transition to fullstack positions.",
+  "core_strengths": ["React", "TypeScript", "GraphQL"],
+  "recommendations": [
+    "Strong frontend skills with modern React patterns",
+    "Excellent UI/UX focus with design system experience",
+    "Would benefit from backend exposure to become fullstack"
+  ],
+  "inferred_seniority": "mid-level",
+  "collaboration_style": "collaborative",
+  "confidence_percentage": 85
+}'::jsonb
+WHERE email = 'emma.w@demo.com';
+
+-- James Park (70% confidence, Junior)
+UPDATE applications
+SET github_data = '{
+  "raw": {
+    "recommendations": {
+      "skill_development": [
+        "Gain experience in backend technologies to enhance fullstack capabilities",
+        "Improve documentation practices",
+        "Learn testing frameworks like Jest or React Testing Library"
+      ],
+      "github_improvements": [
+        "Increase commit frequency and consistency",
+        "Improve README quality for existing projects",
+        "Engage in team projects to demonstrate collaboration skills"
+      ],
+      "project_suggestions": [
+        "Contribute to open-source projects to gain team experience",
+        "Develop a fullstack application to showcase end-to-end skills"
+      ]
+    },
+    "engineer_summary": {
+      "working_style": "independent",
+      "core_strengths": ["JavaScript", "React"],
+      "inferred_seniority": "junior",
+      "collaboration_style": "minimal collaboration"
+    },
+    "job_fit_analysis": {
+      "overall_fit": "weak",
+      "risk_factors": ["low commit frequency", "sporadic activity", "lack of team projects", "no production experience", "limited testing knowledge"],
+      "matched_requirements": ["JavaScript", "React"],
+      "missing_or_weak_areas": ["fullstack experience", "collaboration", "documentation", "testing", "production experience"]
+    },
+    "hiring_recommendation": {
+      "decision": "Do Not Hire Yet",
+      "justification": "James shows enthusiasm and basic React skills, but lacks production experience and testing knowledge. The candidate''s projects are primarily learning exercises rather than production applications. This candidate would require significant mentorship and training before being ready for mid-level roles. Best suited for junior positions with strong support structures.",
+      "confidence_level": "high",
+      "confidence_percentage": 70
+    }
+  },
+  "justification": "James shows enthusiasm and basic React skills, but lacks production experience and testing knowledge. The candidate''s projects are primarily learning exercises rather than production applications. This candidate would require significant mentorship and training before being ready for mid-level roles. Best suited for junior positions with strong support structures.",
+  "core_strengths": ["JavaScript", "React"],
+  "recommendations": [
+    "Needs more production experience and testing knowledge",
+    "Would benefit from mentorship and pair programming",
+    "Consider for junior roles with strong onboarding support"
+  ],
+  "inferred_seniority": "junior",
+  "collaboration_style": "solo-focused",
+  "confidence_percentage": 70
+}'::jsonb
+WHERE email = 'james.p@demo.com';
+
+-- Lisa Kumar (90% confidence, Senior)
+UPDATE applications
+SET github_data = '{
+  "raw": {
+    "recommendations": {
+      "skill_development": [
+        "Continue expanding Kubernetes expertise",
+        "Deepen knowledge in cloud-native architectures"
+      ],
+      "github_improvements": [
+        "Maintain excellent documentation standards",
+        "Continue contributing to infrastructure-as-code projects"
+      ],
+      "project_suggestions": [
+        "Contribute to Kubernetes or Terraform open-source projects",
+        "Build a comprehensive DevOps tooling project"
+      ]
+    },
+    "engineer_summary": {
+      "working_style": "highly collaborative",
+      "core_strengths": ["Kubernetes", "AWS", "Terraform"],
+      "inferred_seniority": "senior",
+      "collaboration_style": "highly collaborative"
+    },
+    "job_fit_analysis": {
+      "overall_fit": "strong",
+      "risk_factors": [],
+      "matched_requirements": ["AWS", "Docker", "CI/CD"],
+      "missing_or_weak_areas": []
+    },
+    "hiring_recommendation": {
+      "decision": "Strong Hire",
+      "justification": "Lisa demonstrates exceptional DevOps and infrastructure expertise with 6 years of experience. Her Kubernetes and AWS skills are production-tested, and she shows strong automation capabilities. The candidate is highly collaborative and would be an excellent fit for platform engineering or senior DevOps roles requiring cloud infrastructure expertise.",
+      "confidence_level": "high",
+      "confidence_percentage": 90
+    }
+  },
+  "justification": "Lisa demonstrates exceptional DevOps and infrastructure expertise with 6 years of experience. Her Kubernetes and AWS skills are production-tested, and she shows strong automation capabilities. The candidate is highly collaborative and would be an excellent fit for platform engineering or senior DevOps roles requiring cloud infrastructure expertise.",
+  "core_strengths": ["Kubernetes", "AWS", "Terraform"],
+  "recommendations": [
+    "Excellent fit for DevOps and infrastructure roles",
+    "Strong cloud architecture and automation skills",
+    "Would excel in platform engineering positions"
+  ],
+  "inferred_seniority": "senior",
+  "collaboration_style": "highly collaborative",
+  "confidence_percentage": 90
+}'::jsonb
+WHERE email = 'lisa.k@demo.com';
+
+-- Tom Wilson (95% confidence, Senior)
+UPDATE applications
+SET github_data = '{
+  "raw": {
+    "recommendations": {
+      "skill_development": [
+        "Continue leading technical initiatives",
+        "Mentor junior engineers to demonstrate leadership"
+      ],
+      "github_improvements": [
+        "Maintain excellent code quality standards",
+        "Continue documenting architectural decisions"
+      ],
+      "project_suggestions": [
+        "Contribute to major open-source fullstack frameworks",
+        "Build a comprehensive fullstack reference architecture"
+      ]
+    },
+    "engineer_summary": {
+      "working_style": "highly collaborative",
+      "core_strengths": ["React", "Node.js", "PostgreSQL", "GraphQL"],
+      "inferred_seniority": "senior",
+      "collaboration_style": "highly collaborative"
+    },
+    "job_fit_analysis": {
+      "overall_fit": "excellent",
+      "risk_factors": [],
+      "matched_requirements": ["React", "Node.js", "PostgreSQL", "AWS", "TypeScript"],
+      "missing_or_weak_areas": []
+    },
+    "hiring_recommendation": {
+      "decision": "Exceptional Hire",
+      "justification": "Tom is an exceptional fullstack engineer with 8 years of production experience building enterprise-scale applications. His React and Node.js expertise is outstanding, and he demonstrates strong architectural thinking with multi-tenancy and real-time systems. The candidate shows excellent collaboration patterns and would be ideal for senior technical leadership roles.",
+      "confidence_level": "very high",
+      "confidence_percentage": 95
+    }
+  },
+  "justification": "Tom is an exceptional fullstack engineer with 8 years of production experience building enterprise-scale applications. His React and Node.js expertise is outstanding, and he demonstrates strong architectural thinking with multi-tenancy and real-time systems. The candidate shows excellent collaboration patterns and would be ideal for senior technical leadership roles.",
+  "core_strengths": ["React", "Node.js", "PostgreSQL", "GraphQL"],
+  "recommendations": [
+    "Exceptional candidate for senior fullstack leadership roles",
+    "Strong architecture and system design capabilities",
+    "Ideal for technical lead or principal engineer positions"
+  ],
+  "inferred_seniority": "senior",
+  "collaboration_style": "highly collaborative",
+  "confidence_percentage": 95
+}'::jsonb
+WHERE email = 'tom.w@demo.com';
+
+-- Verify updates
+SELECT name, email, github_data->>'confidence_percentage' as confidence_percentage, 
+       github_data->>'inferred_seniority' as seniority
+FROM applications
+WHERE email IN ('sarah.chen@demo.com', 'marcus.r@demo.com', 'emma.w@demo.com', 
+                'james.p@demo.com', 'lisa.k@demo.com', 'tom.w@demo.com')
+ORDER BY (github_data->>'confidence_percentage')::int DESC;
+

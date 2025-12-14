@@ -109,17 +109,21 @@ export function transformApplicationToFullProfile(app: BackendApplication): Cand
   const resumeData = app.resume_data || {}
   const githubData = app.github_data || {}
 
-  // Calculate match scores
-  const overallScore = resumeData.suitability_percentage || 75
-  const skillMatchScore = githubData.confidence_percentage || overallScore
+  // Calculate match scores - use decision card data if available, otherwise calculate from resume/github
+  // For full application, we might not have suitability_percentage, so calculate from github confidence
+  const overallScore = resumeData.suitability_percentage || githubData.confidence_percentage || 
+                       (githubData.raw?.hiring_recommendation?.confidence_percentage) || 75
+  const skillMatchScore = githubData.confidence_percentage || githubData.raw?.hiring_recommendation?.confidence_percentage || overallScore
   const experienceMatchScore = overallScore
 
   let fitLevel: 'strong' | 'moderate' | 'weak' = 'moderate'
   if (overallScore >= 85) fitLevel = 'strong'
   else if (overallScore < 65) fitLevel = 'weak'
 
-  // Transform skills
-  const skills = (resumeData.skills || []).map(skill => ({
+  // Transform skills - use skills from resume_data if available
+  const skills = (resumeData.skills && resumeData.skills.length > 0 
+    ? resumeData.skills 
+    : githubData.core_strengths || []).map(skill => ({
     skillName: skill,
     proficiencyLevel: 'advanced' as const,
     yearsOfExperience: resumeData.years_experience || 3,
