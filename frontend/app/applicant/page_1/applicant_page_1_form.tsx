@@ -6,9 +6,9 @@ import { useState } from "react"
 import { ApplicantPage1PdfUpload } from "./applicant_page_1_pdf_upload"
 import { ApplicantPage1GithubProjects } from "./applicant_page_1_github_projects"
 import { ApplicantPage1PersonalInfo } from "./applicant_page_1_personal_info"
-import { ApplicantPage1SuccessModal } from "./applicant_page_1_success_modal"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { ArrowRight } from "lucide-react"
 
 export interface ApplicantFormData {
   fullName: string
@@ -27,12 +27,10 @@ export function ApplicantPage1Form() {
     githubProjectUrls: [""],
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [formErrors, setFormErrors] = useState<Record<string, string>>({})
 
   const handlePersonalInfoChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
-    // Clear error when user starts typing
     if (formErrors[field]) {
       setFormErrors((prev) => {
         const newErrors = { ...prev }
@@ -103,18 +101,17 @@ export function ApplicantPage1Form() {
 
     setIsSubmitting(true)
 
-    // Simulate API call - Replace with actual backend integration
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    sessionStorage.setItem("applicant_page_1_data", JSON.stringify(formData))
 
-    console.log("Form submitted:", formData)
+    await new Promise((resolve) => setTimeout(resolve, 500))
 
     setIsSubmitting(false)
-    setShowSuccessModal(true)
+
+    window.location.href = "/applicant/page_2"
   }
 
   const handleCloseSuccessModal = () => {
-    setShowSuccessModal(false)
-    // Reset form
+    // setShowSuccessModal(false)
     setFormData({
       fullName: "",
       email: "",
@@ -122,12 +119,13 @@ export function ApplicantPage1Form() {
       resumeFile: null,
       githubProjectUrls: [""],
     })
+    setFormErrors({})
   }
 
   return (
     <>
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Card className="border-2">
+        <Card className="border-2 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader>
             <CardTitle className="text-navy-blue">Personal Information</CardTitle>
             <CardDescription>Tell us about yourself</CardDescription>
@@ -143,7 +141,7 @@ export function ApplicantPage1Form() {
           </CardContent>
         </Card>
 
-        <Card className="border-2">
+        <Card className="border-2 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader>
             <CardTitle className="text-navy-blue">Resume Upload</CardTitle>
             <CardDescription>Upload your resume in PDF format</CardDescription>
@@ -157,7 +155,7 @@ export function ApplicantPage1Form() {
           </CardContent>
         </Card>
 
-        <Card className="border-2">
+        <Card className="border-2 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader>
             <CardTitle className="text-navy-blue">GitHub Projects</CardTitle>
             <CardDescription>Share links to your best work</CardDescription>
@@ -194,14 +192,13 @@ export function ApplicantPage1Form() {
             type="submit"
             size="lg"
             disabled={isSubmitting}
-            className="bg-peach-orange hover:bg-light-peach text-navy-blue font-semibold"
+            className="bg-peach-orange hover:bg-light-peach text-navy-blue font-semibold transition-all hover:scale-105"
           >
-            {isSubmitting ? "Submitting..." : "Submit Application"}
+            {isSubmitting ? "Processing..." : "Continue"}
+            <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>
       </form>
-
-      <ApplicantPage1SuccessModal isOpen={showSuccessModal} onClose={handleCloseSuccessModal} />
     </>
   )
 }
