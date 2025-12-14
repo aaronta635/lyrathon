@@ -24,6 +24,7 @@ class Application(Base):
     # Phase 1: Resume + GitHub
     resume_url = Column(String, nullable=True)  # Path to stored PDF
     github_url = Column(String, nullable=True)
+    focus = Column(String, nullable=True)  # "fullstack", "frontend", or "backend"
     
     # Phase 2: Video + Deploy
     video_url = Column(String, nullable=True)

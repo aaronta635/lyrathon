@@ -1,6 +1,7 @@
 fastapi
 uvicorn[standard]
 sqlalchemy
+psycopg2-binary  # PostgreSQL driver for Supabase
 pydantic
 pydantic-settings
 python-jose[cryptography]

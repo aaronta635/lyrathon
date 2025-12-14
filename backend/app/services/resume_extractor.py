@@ -28,19 +28,16 @@ def extract_built_from_text(resume_text: str) -> dict:
         "risk_flags": ["concern 1", ...]
     }
     """
+    if not settings.openai_api_key:
+        raise ValueError("OpenAI API key not configured")
+    
     client = OpenAI(api_key=settings.openai_api_key)
     
     prompt = """You are analyzing a software engineer's resume to produce a fast, recruiter-ready decision summary.
 
 Extract the following information:
 
-1. role_label  
-The most appropriate primary role for this engineer.
-Choose ONE from:
-"Backend Engineer", "Frontend Engineer", "Fullstack Engineer",
-"DevOps Engineer", "Data Engineer", "Mobile Engineer".
-
-2. built  
+1. built  
 A list of concrete systems, products, or features the engineer BUILT, SHIPPED, or OWNED.
 
 CRITICAL RULES:
@@ -55,43 +52,16 @@ GOOD: "Real-time multiplayer poker platform"
 GOOD: "Authentication system for SaaS product"
 BAD: "Built APIs using Node.js and PostgreSQL"
 
-3. skill_signals  
-High-level capability signals inferred from experience.
-These are NOT tools or technologies.
+2. suitability_percentage
+A percentage (0-100) indicating how suitable this candidate is for a software engineering role based on their resume.
 
-Examples:
-- "Backend system ownership"
-- "API design and maintenance"
-- "Production debugging experience"
+Consider:
+- Relevant experience
+- Technical depth
+- Project quality
+- Career progression
 
-Rules:
-- Maximum 3 items
-- No programming languages
-- No frameworks
-- No buzzwords
-
-4. experience_summary  
-A short human-readable summary of experience.
-Format: "<X> years building <type> systems"
-
-Examples:
-- "4 years building backend systems"
-- "2 years building full-stack web applications"
-
-5. risk_flags  
-Concrete, recruiter-relevant concerns based ONLY on evidence in the resume.
-
-Rules:
-- Be specific and factual
-- Avoid vague statements
-- Do NOT invent risks
-- Maximum 3 items
-- If no clear risks exist, return an empty array
-
-Examples:
-GOOD: "No evidence of production-scale systems"
-GOOD: "Multiple roles under one year duration"
-BAD: "Might struggle in senior role"
+Return as an integer (e.g., 75, not "75%").
 
 Return ONLY valid JSON.
 No explanations.
@@ -122,11 +92,8 @@ def extract_resume(pdf_file) -> dict:
     if not text.strip():
         return {
             "error": "Could not extract text from PDF",
-            "role_label": None,
             "built": [],
-            "skills": [],
-            "years_experience": None,
-            "risk_flags": ["Could not parse resume"]
+            "suitability_percentage": None
         }
     
     return extract_built_from_text(text)

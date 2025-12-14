@@ -39,6 +39,14 @@ class ApplicationMediaUpdate(BaseModel):
     can_embed: Optional[bool] = None
 
 
+# Built item verification result
+class BuiltVerification(BaseModel):
+    item: str
+    confidence: int  # 0-100 percentage match
+    matched_repo: Optional[str] = None
+    repo_url: Optional[str] = None
+
+
 # Resume extraction result (stored in resume_data)
 class ResumeData(BaseModel):
     role_label: Optional[str] = None
@@ -46,6 +54,7 @@ class ResumeData(BaseModel):
     skills: list[str] = []
     years_experience: Optional[int] = None
     risk_flags: list[str] = []
+    built_verification: Optional[list[BuiltVerification]] = None  # Verification results
 
 
 # GitHub analysis result (stored in github_data)
@@ -79,10 +88,20 @@ class ApplicationResponse(BaseModel):
 class DecisionCardResponse(BaseModel):
     id: str
     name: str
-    role_label: Optional[str] = None
-    built: list[str] = []
-    github_signals: Optional[GitHubData] = None
-    risk_flags: list[str] = []
+    built: list[str] = []  # From resume extraction (AI built only)
+    # GitHub analyzer data
+    inferred_seniority: Optional[str] = None  # From engineer_summary.inferred_seniority
+    core_strengths: list[str] = []  # From engineer_summary.core_strengths
+    collaboration_style: Optional[str] = None  # From engineer_summary.collaboration_style
+    # Combined recommendations
+    recommendations: list[str] = []  # All recommendations combined (limited to first 3)
+    # Hiring recommendation
+    justification: Optional[str] = None  # From hiring_recommendation.justification
+    # Built verification
+    built_verification: Optional[list[BuiltVerification]] = None  # Verification of built items
+    # Percentages
+    suitability_percentage: Optional[int] = None  # From resume extraction
+    confidence_percentage: Optional[int] = None  # From hiring_recommendation.confidence_percentage
     status: ApplicationStatus
     created_at: datetime
 
