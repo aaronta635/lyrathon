@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Sparkles, User, ArrowLeftRight } from "lucide-react"
 
 interface NavigationHeaderProps {
@@ -17,10 +18,14 @@ export default function NavigationHeader({ currentMode }: NavigationHeaderProps)
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <div className="h-8 w-8 rounded-lg bg-[#00756a] flex items-center justify-center">
-              <Sparkles className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-xl font-bold text-white">Talent Pipeline</span>
+            <Image 
+              src="/images/logo.png" 
+              alt="GitProof" 
+              width={120} 
+              height={32}
+              className="h-8 w-auto"
+            />
+            <span className="text-xl font-bold text-white">GitProof</span>
           </Link>
 
           {/* Profile/Mode Switcher */}

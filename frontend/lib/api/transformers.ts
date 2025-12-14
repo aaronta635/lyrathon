@@ -52,6 +52,17 @@ export interface BackendApplication {
     recommendations?: string[]
     justification?: string
     confidence_percentage?: number
+    raw?: {
+      engineer_summary?: {
+        inferred_seniority?: string
+        core_strengths?: string[]
+        working_style?: string
+        collaboration_style?: string
+      }
+      hiring_recommendation?: {
+        confidence_percentage?: number
+      }
+    }
   }
   status: 'processing' | 'awaiting_media' | 'ready' | 'failed'
   created_at: string
@@ -166,10 +177,18 @@ export function transformApplicationToFullProfile(app: BackendApplication): Cand
     hiringRecommendation: githubData.justification || 'Candidate shows strong potential.',
     justification: githubData.justification, // Full justification text
     engineerSummary: {
-      inferred_seniority: githubData.inferred_seniority || 'mid-level',
-      core_strengths: githubData.core_strengths || [],
-      working_style: 'independent',
-      collaboration_style: githubData.collaboration_style || 'collaborative',
+      // Read from nested raw.engineer_summary first, then top-level, then defaults
+      inferred_seniority: (githubData.raw?.engineer_summary?.inferred_seniority) ||
+                         githubData.inferred_seniority || 
+                         'mid-level',
+      core_strengths: (githubData.raw?.engineer_summary?.core_strengths) ||
+                     githubData.core_strengths || 
+                     [],
+      working_style: (githubData.raw?.engineer_summary?.working_style) ||
+                    'independent',
+      collaboration_style: (githubData.raw?.engineer_summary?.collaboration_style) ||
+                          githubData.collaboration_style || 
+                          'collaborative',
     },
     recommendations: (githubData.recommendations || []).slice(0, 3), // Limit to 3 recommendations
     strengths: githubData.core_strengths || [],

@@ -267,6 +267,7 @@ export default function RecruiterDashboard() {
   const [jobs, setJobs] = useState<JobPostingInfo[]>(mockJobs)
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null)
   const [candidates, setCandidates] = useState<any[]>([])
+  const [rawDecisionCards, setRawDecisionCards] = useState<any[]>([]) // Store raw decision card data
   const [selectedJobId, setSelectedJobId] = useState("job-001")
   const [jobOverrides, setJobOverrides] = useState<Partial<JobPostingInfo>>({})
   const [sortBy, setSortBy] = useState("score-desc")
@@ -286,6 +287,14 @@ export default function RecruiterDashboard() {
           getDashboardMetrics(),
           getCandidates(),
         ])
+        
+        // Also fetch raw decision card data for engineerSummary
+        const { getApplications } = await import('@/lib/api/applications')
+        const rawApplications = await getApplications().catch(() => [])
+        const readyRawCards = rawApplications.filter((app: any) => 
+          app.status === 'ready' || app.status === 'awaiting_media'
+        )
+        
         console.log('Dashboard data loaded:', {
           jobs: jobsData.length,
           metrics: metricsData,
@@ -295,12 +304,14 @@ export default function RecruiterDashboard() {
         setJobs(jobsData)
         setMetrics(metricsData)
         setCandidates(candidatesData)
+        setRawDecisionCards(readyRawCards)
       } catch (error) {
         console.error('Error fetching data:', error)
         // Use mock data as fallback
         setJobs(mockJobs)
         setMetrics(mockMetrics)
         setCandidates(mockCandidates)
+        setRawDecisionCards([])
       } finally {
         setLoading(false)
       }
@@ -320,12 +331,51 @@ export default function RecruiterDashboard() {
       // Fetch full profile
       getCandidateProfile(selectedCandidateId).then(profile => {
         if (profile && candidateFromList) {
+          // Find raw decision card data to build engineerSummary
+          const rawCard = rawDecisionCards.find((card: any) => card.id === selectedCandidateId)
+          
+          // Build engineerSummary from raw decision card data (which has the correct values)
+          // The decision card endpoint has the data at top level, but full app endpoint might not
+          let engineerSummary = profile.engineerSummary
+          
+          // If we have raw decision card data, use it to build engineerSummary
+          if (rawCard) {
+            // Infer working_style from collaboration_style
+            const collabStyle = rawCard.collaboration_style || ''
+            let workingStyle = 'independent'
+            if (collabStyle.toLowerCase().includes('highly collaborative') || 
+                collabStyle.toLowerCase().includes('collaborative')) {
+              workingStyle = 'collaborative'
+            } else if (collabStyle.toLowerCase().includes('moderate')) {
+              workingStyle = 'moderate collaboration'
+            } else if (collabStyle.toLowerCase().includes('solo') || 
+                       collabStyle.toLowerCase().includes('minimal')) {
+              workingStyle = 'independent'
+            }
+            
+            engineerSummary = {
+              inferred_seniority: rawCard.inferred_seniority || 'mid-level',
+              core_strengths: rawCard.core_strengths || candidateFromList.topSkills || [],
+              working_style: workingStyle,
+              collaboration_style: rawCard.collaboration_style || 'collaborative',
+            }
+          } else if (!engineerSummary?.core_strengths || engineerSummary.core_strengths.length === 0) {
+            // Fallback to profile data if no raw card
+            engineerSummary = profile.engineerSummary || {
+              inferred_seniority: 'mid-level',
+              core_strengths: candidateFromList.topSkills || [],
+              working_style: 'independent',
+              collaboration_style: 'collaborative',
+            }
+          }
+          
           // Merge data from the list item (which has the correct match score from decision card)
           setSelectedCandidateProfile({
             ...profile,
             matchScore: candidateFromList.matchScore, // Use match score from decision card
             justification: candidateFromList.justification || profile.justification,
             recommendations: candidateFromList.recommendations || profile.recommendations,
+            engineerSummary: engineerSummary,
           })
         } else {
           setSelectedCandidateProfile(profile)
@@ -335,7 +385,7 @@ export default function RecruiterDashboard() {
       setSelectedCandidateProfile(null)
       setSelectedCandidateListItem(null)
     }
-  }, [selectedCandidateId, candidates])
+  }, [selectedCandidateId, candidates, rawDecisionCards])
 
   const allJobsDefault: JobPostingInfo = {
     jobId: "all",
