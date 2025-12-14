@@ -1,3 +1,4 @@
+"use client"
 import Link from "next/link"
 import { ArrowRight, Users, FileText, Sparkles, Clock, Shield } from "lucide-react"
 import NavigationHeader from "@/components/navigation_header"
