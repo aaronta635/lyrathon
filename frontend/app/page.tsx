@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Calendar } from "lucide-react"
 import { JobBlock } from "@/components/recruitment/job-block"
 import { CandidateCard } from "@/components/recruitment/candidate-card"
@@ -13,249 +13,35 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import type { JobPostingInfo, DashboardMetrics, CandidateFullProfile } from "@/lib/types"
-
-// Mock data for demonstration
-const mockJobs: JobPostingInfo[] = [
-  {
-    jobId: "job-001",
-    jobTitle: "Senior Full-Stack Engineer",
-    location: "Sydney",
-    employmentType: "full-time",
-    salaryRange: {
-      minSalary: 140000,
-      maxSalary: 180000,
-      currency: "AUD",
-    },
-    requiredSkills: ["AWS", "PostgreSQL", "React", "Node.js"],
-  },
-  {
-    jobId: "job-002",
-    jobTitle: "Frontend Developer",
-    location: "Melbourne",
-    employmentType: "full-time",
-    salaryRange: {
-      minSalary: 100000,
-      maxSalary: 130000,
-      currency: "AUD",
-    },
-    requiredSkills: ["React", "TypeScript", "CSS", "Figma"],
-  },
-  {
-    jobId: "job-003",
-    jobTitle: "Backend Engineer",
-    location: "Sydney",
-    employmentType: "full-time",
-    salaryRange: {
-      minSalary: 120000,
-      maxSalary: 160000,
-      currency: "AUD",
-    },
-    requiredSkills: ["Python", "PostgreSQL", "AWS", "Docker"],
-  },
-  {
-    jobId: "job-004",
-    jobTitle: "DevOps Engineer",
-    location: "Remote",
-    employmentType: "contract",
-    salaryRange: {
-      minSalary: 130000,
-      maxSalary: 170000,
-      currency: "AUD",
-    },
-    requiredSkills: ["Kubernetes", "AWS", "Terraform", "CI/CD"],
-  },
-]
-
-const mockMetrics: DashboardMetrics = {
-  totalCandidates: 6,
-  candidateChangePercentage: 12,
-  averageMatchScore: 89,
-  matchScoreImprovement: 5,
-  activeInterviews: 5,
-  interviewsInPipeline: 5,
-  topSkillMatchPercentage: 100,
-  skillMatchThreshold: 85,
-}
-
-const mockCandidates = [
-  {
-    candidateInfo: {
-      candidateId: "cand-001",
-      fullName: "Sarah Chen",
-      location: "Sydney, AU",
-      yearsOfExperience: 5,
-      currentCompany: "Tech Corp",
-    },
-    engineeringType: "Full-Stack",
-    matchScore: {
-      overallScore: 92,
-      skillMatchScore: 95,
-      experienceMatchScore: 90,
-      fitLevel: "strong" as const,
-    },
-    topSkills: ["React", "Node.js", "AWS"],
-  },
-  {
-    candidateInfo: {
-      candidateId: "cand-002",
-      fullName: "Marcus Rodriguez",
-      location: "Melbourne, AU",
-      yearsOfExperience: 3,
-      currentCompany: "StartupXYZ",
-    },
-    engineeringType: "Backend",
-    matchScore: {
-      overallScore: 78,
-      skillMatchScore: 80,
-      experienceMatchScore: 75,
-      fitLevel: "moderate" as const,
-    },
-    topSkills: ["Python", "Django", "PostgreSQL"],
-  },
-  {
-    candidateInfo: {
-      candidateId: "cand-003",
-      fullName: "Emma Watson",
-      location: "Sydney, AU",
-      yearsOfExperience: 4,
-      currentCompany: "Digital Agency",
-    },
-    engineeringType: "Frontend",
-    matchScore: {
-      overallScore: 85,
-      skillMatchScore: 88,
-      experienceMatchScore: 82,
-      fitLevel: "strong" as const,
-    },
-    topSkills: ["React", "TypeScript", "GraphQL"],
-  },
-  {
-    candidateInfo: {
-      candidateId: "cand-004",
-      fullName: "James Park",
-      location: "Brisbane, AU",
-      yearsOfExperience: 2,
-      currentCompany: "Consulting Firm",
-    },
-    engineeringType: "Frontend",
-    matchScore: {
-      overallScore: 65,
-      skillMatchScore: 70,
-      experienceMatchScore: 60,
-      fitLevel: "weak" as const,
-    },
-    topSkills: ["JavaScript", "Vue.js", "MongoDB"],
-  },
-  {
-    candidateInfo: {
-      candidateId: "cand-005",
-      fullName: "Lisa Kumar",
-      location: "Remote",
-      yearsOfExperience: 6,
-      currentCompany: "CloudTech Inc",
-    },
-    engineeringType: "DevOps",
-    matchScore: {
-      overallScore: 88,
-      skillMatchScore: 90,
-      experienceMatchScore: 85,
-      fitLevel: "strong" as const,
-    },
-    topSkills: ["Kubernetes", "AWS", "Terraform"],
-  },
-  {
-    candidateInfo: {
-      candidateId: "cand-006",
-      fullName: "Tom Wilson",
-      location: "Sydney, AU",
-      yearsOfExperience: 7,
-      currentCompany: "Enterprise Corp",
-    },
-    engineeringType: "Full-Stack",
-    matchScore: {
-      overallScore: 95,
-      skillMatchScore: 98,
-      experienceMatchScore: 92,
-      fitLevel: "strong" as const,
-    },
-    topSkills: ["React", "Node.js", "PostgreSQL"],
-  },
-]
-
-const mockFullProfile: CandidateFullProfile = {
-  basicInfo: {
-    candidateId: "cand-001",
-    fullName: "Sarah Chen",
-    location: "Sydney, AU",
-    yearsOfExperience: 5,
-    currentCompany: "Tech Corp",
-  },
-  matchScore: {
-    overallScore: 92,
-    skillMatchScore: 95,
-    experienceMatchScore: 90,
-    fitLevel: "strong",
-  },
-  skills: [
-    { skillName: "React", proficiencyLevel: "expert", yearsOfExperience: 5, isVerified: true },
-    { skillName: "Node.js", proficiencyLevel: "expert", yearsOfExperience: 5, isVerified: true },
-    { skillName: "AWS", proficiencyLevel: "advanced", yearsOfExperience: 4, isVerified: true },
-    { skillName: "PostgreSQL", proficiencyLevel: "advanced", yearsOfExperience: 4, isVerified: false },
-    { skillName: "TypeScript", proficiencyLevel: "expert", yearsOfExperience: 4, isVerified: true },
-  ],
-  projects: [
-    {
-      projectId: "proj-001",
-      projectTitle: "Payment integration",
-      projectDescription: "Built scalable payment processing system with Stripe",
-      technologiesUsed: ["Stripe", "Node.js", "React"],
-      githubUrl: "https://github.com/example",
-      completionDate: "2024-01",
-    },
-    {
-      projectId: "proj-002",
-      projectTitle: "E-commerce platform",
-      projectDescription: "Full-stack e-commerce solution with real-time inventory",
-      technologiesUsed: ["Next.js", "PostgreSQL"],
-      liveUrl: "https://example.com",
-      completionDate: "2023-09",
-    },
-    {
-      projectId: "proj-003",
-      projectTitle: "Auth system",
-      projectDescription: "Secure authentication system with OAuth support",
-      technologiesUsed: ["Supabase Auth", "React"],
-      githubUrl: "https://github.com/example",
-      completionDate: "2023-05",
-    },
-  ],
-  githubMetrics: {
-    commitFrequency: "4-5 days/week for 18 months",
-    codeQualityScore: 85,
-    testCoverage: 80,
-    hasDocumentation: true,
-    activityTrend: "increasing",
-  },
-  professionalSummary: "Backend engineer with verified AWS + SQL experience, Sydney-based, 5 years experience.",
-  resumeUrl: "/resumes/sarah-chen.pdf",
-  strengths: [
-    "Strong React and TypeScript expertise",
-    "Proven AWS cloud experience",
-    "Excellent code quality scores",
-  ],
-  risks: [
-    "Limited Next.js App Router experience",
-    "No Tailwind CSS v4 experience",
-    "Unfamiliar with Radix UI primitives",
-  ],
-}
+import { getJobs, getDashboardMetrics, getCandidates, getCandidateProfile } from "@/lib/api/recruitment"
+import type { CandidateListItem } from "@/lib/api/mock-data"
 
 export default function RecruitmentDashboard() {
+  const [jobs, setJobs] = useState<JobPostingInfo[]>([])
+  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null)
+  const [candidates, setCandidates] = useState<CandidateListItem[]>([])
+  const [selectedCandidateProfile, setSelectedCandidateProfile] = useState<CandidateFullProfile | null>(null)
   const [selectedJobId, setSelectedJobId] = useState("job-001")
   const [jobOverrides, setJobOverrides] = useState<Partial<JobPostingInfo>>({})
   const [sortBy, setSortBy] = useState("score-desc")
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
+
+  // Fetch data on mount
+  useEffect(() => {
+    getJobs().then(setJobs)
+    getDashboardMetrics().then(setMetrics)
+    getCandidates().then(setCandidates)
+  }, [])
+
+  // Fetch candidate profile when selected
+  useEffect(() => {
+    if (selectedCandidateId) {
+      getCandidateProfile(selectedCandidateId).then(setSelectedCandidateProfile)
+    } else {
+      setSelectedCandidateProfile(null)
+    }
+  }, [selectedCandidateId])
 
   const allJobsDefault: JobPostingInfo = {
     jobId: "all",
@@ -265,15 +51,15 @@ export default function RecruitmentDashboard() {
     salaryRange: { minSalary: 0, maxSalary: 999999, currency: "AUD" },
     requiredSkills: [],
   }
-  const baseJob = selectedJobId === "all" ? allJobsDefault : (mockJobs.find((job) => job.jobId === selectedJobId) || mockJobs[0])
-  const currentJob = { ...baseJob, ...jobOverrides }
+  const baseJob = selectedJobId === "all" ? allJobsDefault : (jobs.find((job) => job.jobId === selectedJobId) || jobs[0] || allJobsDefault)
+  const currentJob = baseJob ? { ...baseJob, ...jobOverrides } : allJobsDefault
   
   const handleJobInfoUpdate = (updates: Partial<JobPostingInfo>) => {
     setJobOverrides(prev => ({ ...prev, ...updates }))
   }
   
   // Filter candidates by location and skill match, then sort
-  const filteredAndSortedCandidates = mockCandidates
+  const filteredAndSortedCandidates = candidates
     .filter(candidate => {
       // Location filter: "All Locations" shows everyone, otherwise match job location or Remote
       const jobLocation = currentJob.location
@@ -359,16 +145,18 @@ export default function RecruitmentDashboard() {
       {/* Main content */}
       <main className="container mx-auto px-6 py-8">
         {/* Job posting block with inline metrics */}
-        <JobBlock 
-          jobInfo={currentJob}
-          metrics={mockMetrics}
-          allJobs={mockJobs.map((j) => ({ jobId: j.jobId, jobTitle: j.jobTitle }))}
-          onJobChange={(jobId) => {
-            setSelectedJobId(jobId)
-            setJobOverrides({}) // Reset overrides when changing jobs
-          }}
-          onJobInfoUpdate={handleJobInfoUpdate}
-        />
+        {metrics && (
+          <JobBlock 
+            jobInfo={currentJob}
+            metrics={metrics}
+            allJobs={jobs.map((j) => ({ jobId: j.jobId, jobTitle: j.jobTitle }))}
+            onJobChange={(jobId) => {
+              setSelectedJobId(jobId)
+              setJobOverrides({}) // Reset overrides when changing jobs
+            }}
+            onJobInfoUpdate={handleJobInfoUpdate}
+          />
+        )}
 
         {/* Section title + sort */}
         <div className="flex items-center justify-between mb-4">
@@ -408,7 +196,7 @@ export default function RecruitmentDashboard() {
       <CandidateDetailModal
         isOpen={isDetailModalOpen}
         onClose={handleCloseModal}
-        candidateProfile={selectedCandidateId ? mockFullProfile : null}
+        candidateProfile={selectedCandidateProfile}
         onMoveToInterview={(id) => console.log("Move to interview:", id)}
         onReject={(id) => console.log("Reject candidate:", id)}
         onViewResume={(url) => console.log("View resume:", url)}
