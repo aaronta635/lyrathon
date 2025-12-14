@@ -13,11 +13,21 @@ interface JobBlockProps {
   className?: string
 }
 
+// Color-coded match system
+const getScoreColor = (score: number) => {
+  if (score >= 90) return "#10B981" // Dark green - Excellent
+  if (score >= 70) return "#4ECDC4" // Mint teal - Good
+  if (score >= 50) return "#F59E0B" // Amber - Moderate
+  return "#FF6B6B" // Coral red - Weak
+}
+
 export function JobBlock({ jobInfo, metrics, allJobs, onJobChange, onJobInfoUpdate, className = "" }: JobBlockProps) {
+  const avgMatchColor = getScoreColor(metrics.averageMatchScore)
+
   return (
     <Card 
       className={`p-8 mb-8 border-0 rounded-2xl relative z-10 ${className}`}
-      style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.08)' }}
+      style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.1), 0 4px 8px rgba(0,0,0,0.06)' }}
     >
       {/* Top row: Job title + metrics */}
       <div className="flex items-start justify-between mb-3">
@@ -44,11 +54,11 @@ export function JobBlock({ jobInfo, metrics, allJobs, onJobChange, onJobInfoUpda
             className="flex items-center gap-3 bg-card px-5 py-3 rounded-xl"
             style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}
           >
-            <div className="p-2 rounded-lg bg-accent/10">
-              <Target className="h-5 w-5 text-accent" />
+            <div className="p-2 rounded-lg" style={{ backgroundColor: `${avgMatchColor}15` }}>
+              <Target className="h-5 w-5" style={{ color: avgMatchColor }} />
             </div>
             <div>
-              <p className="text-2xl font-bold text-accent">{metrics.averageMatchScore}%</p>
+              <p className="text-2xl font-bold" style={{ color: avgMatchColor }}>{metrics.averageMatchScore}%</p>
               <p className="text-xs text-muted-foreground">Avg Match</p>
             </div>
           </div>

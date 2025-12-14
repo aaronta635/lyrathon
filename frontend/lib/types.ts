@@ -55,6 +55,7 @@ export interface CandidateFullProfile {
   engineerSummary?: EngineerSummary // Personality from GitHub analyzer
   recommendations?: string[] // Hiring recommendations
   resumeUrl: string
+  linkedinUrl?: string
 }
 
 export interface JobPostingInfo {

@@ -15,25 +15,24 @@ interface CandidateCardProps {
 }
 
 export function CandidateCard({ candidateInfo, matchScore, topSkills, engineeringType, expectedSalary, onCardClick }: CandidateCardProps) {
-  // Score colors: red (<50), yellow (50-70), green shades (70+)
+  // Color-coded match system
   const getScoreColor = (score: number) => {
-    if (score < 50) return { bg: "#dc3545", border: "#dc3545", text: "white" } // Red
-    if (score < 70) return { bg: "#f5a623", border: "#f5a623", text: "white" } // Yellow
-    if (score < 80) return { bg: "#45B7AF", border: "#45B7AF", text: "white" } // Medium teal
-    if (score < 90) return { bg: "#3c8d93", border: "#3c8d93", text: "white" } // Darker teal
-    return { bg: "#1a5a52", border: "#1a5a52", text: "white" } // Dark teal (90+)
+    if (score >= 90) return "#10B981" // Dark green - Excellent
+    if (score >= 70) return "#4ECDC4" // Mint teal - Good
+    if (score >= 50) return "#F59E0B" // Amber - Moderate
+    return "#FF6B6B" // Coral red - Weak
   }
 
-  const scoreColors = getScoreColor(matchScore.overallScore)
+  const scoreColor = getScoreColor(matchScore.overallScore)
 
   const formatSalary = (salary: number) => `$${Math.round(salary / 1000)}k`
 
   return (
     <Card
-      className="relative bg-card p-6 cursor-pointer transition-all duration-300 border-0 rounded-2xl hover:scale-[1.02]"
+      className="relative bg-card p-6 cursor-pointer transition-all duration-200 border-0 rounded-2xl hover:scale-[1.02]"
       style={{ 
         boxShadow: '0 10px 30px rgba(0,0,0,0.1), 0 4px 8px rgba(0,0,0,0.06)',
-        borderLeft: `4px solid ${scoreColors.border}`,
+        borderLeft: `4px solid ${scoreColor}`,
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.12), 0 8px 16px rgba(0,0,0,0.08)'
@@ -45,8 +44,11 @@ export function CandidateCard({ candidateInfo, matchScore, topSkills, engineerin
     >
       {/* Match score badge - top right */}
       <div 
-        className="absolute top-4 right-4 px-3 py-1.5 rounded-full text-sm font-semibold"
-        style={{ backgroundColor: scoreColors.bg, color: scoreColors.text }}
+        className="absolute top-4 right-4 px-3.5 py-2 rounded-lg text-sm font-semibold text-white transition-all duration-200 hover:brightness-90"
+        style={{ 
+          backgroundColor: scoreColor,
+          boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
+        }}
       >
         {matchScore.overallScore}%
       </div>

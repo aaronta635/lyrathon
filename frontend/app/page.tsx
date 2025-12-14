@@ -208,6 +208,7 @@ const mockFullProfile: CandidateFullProfile = {
     experienceMatchScore: 90,
     fitLevel: "strong",
   },
+  linkedinUrl: "https://www.linkedin.com/in/sarah-chen",
   skills: [
     { skillName: "React", proficiencyLevel: "expert", yearsOfExperience: 5, isVerified: true },
     { skillName: "Node.js", proficiencyLevel: "expert", yearsOfExperience: 5, isVerified: true },

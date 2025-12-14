@@ -3,9 +3,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { MapPin, Calendar, ArrowLeft, CheckCircle, XCircle, FileText } from "lucide-react"
+import { MapPin, Calendar, ArrowLeft, CheckCircle, XCircle, FileText, Linkedin } from "lucide-react"
 import { MatchScoreDisplay } from "./match-score-display"
-import { FitLevelBadge } from "./fit-level-badge"
 import { SkillBadge } from "./skill-badge"
 import { BuiltProjectsCard } from "./built-projects-card"
 import { PersonalityCard } from "./personality-card"
@@ -33,7 +32,7 @@ export function CandidateDetailModal({
 }: CandidateDetailModalProps) {
   if (!candidateProfile) return null
 
-  const { basicInfo, matchScore, skills, projects, hiringRecommendation, engineerSummary, recommendations, resumeUrl } = candidateProfile
+  const { basicInfo, matchScore, skills, projects, hiringRecommendation, engineerSummary, recommendations, resumeUrl, linkedinUrl } = candidateProfile
 
   const isSkillMatched = (skillName: string) => {
     if (jobRequiredSkills.length === 0) return true
@@ -86,12 +85,22 @@ export function CandidateDetailModal({
                     <Calendar className="h-4 w-4" />
                     <span>{basicInfo.yearsOfExperience}y exp</span>
                   </div>
+                  {linkedinUrl && (
+                    <a
+                      href={linkedinUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-white hover:text-white transition-colors"
+                    >
+                      <Linkedin className="h-4 w-4" />
+                      <span>LinkedIn</span>
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
             <div className="flex flex-col items-end gap-2">
               <MatchScoreDisplay scorePercentage={matchScore.overallScore} size="md" />
-              <FitLevelBadge fitLevel={matchScore.fitLevel} />
             </div>
           </div>
         </div>
@@ -101,38 +110,10 @@ export function CandidateDetailModal({
         </DialogHeader>
 
         {/* Content */}
-        <div className="p-6">
-          {/* Hiring Recommendation card */}
-          <Card 
-            className="mb-6 border-0 rounded-xl overflow-hidden"
-            style={{ 
-              boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
-              borderLeft: '4px solid #45B7AF'
-            }}
-          >
-            <CardContent className="p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-lg">💡</span>
-                <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Hiring Recommendation</h3>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">{hiringRecommendation}</p>
-            </CardContent>
-          </Card>
-
-          {/* View Resume button */}
-          <button
-            onClick={() => onViewResume?.(resumeUrl)}
-            className="flex items-center gap-2 text-sm font-semibold text-secondary hover:text-secondary/80 transition-colors mb-6"
-          >
-            <FileText className="h-4 w-4" />
-            View Full Resume →
-          </button>
-
-          {/* Skills */}
-          <div className="mb-6">
-            <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-              <span>🛠️</span> Skills
-            </h3>
+        <div className="p-5 space-y-5">
+          {/* Skills immediately after header */}
+          <div>
+            <h3 className="text-sm font-semibold text-foreground mb-2">Skills</h3>
             <div className="flex flex-wrap gap-2">
               {skills.map((skill) => (
                 <SkillBadge
@@ -145,8 +126,24 @@ export function CandidateDetailModal({
             </div>
           </div>
 
-          {/* Projects and Personality grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
+          {/* Hiring Recommendation - priority block */}
+          <div 
+            className="rounded-lg border-0"
+            style={{ borderLeft: '4px solid #4ECDC4', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+          >
+            <div className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <FileText className="h-5 w-5 text-secondary" />
+                <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Recommendation</h3>
+              </div>
+              <p className="text-sm text-foreground leading-relaxed">
+                <strong>Strong candidate.</strong> React and Node.js experience is excellent and well-documented. AWS skills are production-tested. <strong>However, lacks modern Next.js App Router experience</strong> which may require onboarding time.
+              </p>
+            </div>
+          </div>
+
+          {/* Two-column: Projects | Personality */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <BuiltProjectsCard
               projects={projects}
               onViewProject={(projectId) => console.log("View project:", projectId)}
@@ -156,27 +153,25 @@ export function CandidateDetailModal({
             )}
           </div>
 
-          {/* Recommendations */}
+          {/* Hiring decision points */}
           {recommendations && recommendations.length > 0 && (
-            <div className="mb-6">
-              <RecommendationsCard recommendations={recommendations} />
-            </div>
+            <RecommendationsCard recommendations={recommendations} />
           )}
 
           {/* Action buttons */}
-          <div className="grid grid-cols-2 gap-4 pt-5 border-t border-border">
+          <div className="grid grid-cols-2 gap-4 pt-4">
             <Button 
               variant="outline" 
               size="lg"
               onClick={() => onReject?.(basicInfo.candidateId)} 
-              className="rounded-xl border-2 text-muted-foreground hover:text-destructive hover:border-destructive/30 hover:bg-destructive/5 transition-all"
+              className="rounded-xl border text-foreground hover:text-destructive hover:border-destructive/40 hover:bg-destructive/5 transition-all w-full py-4"
             >
               <XCircle className="h-5 w-5 mr-2" />
               Reject
             </Button>
             <Button
               size="lg"
-              className="rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold transition-all hover:scale-[1.02]"
+              className="rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold transition-all hover:scale-[1.02] w-full py-4"
               style={{ boxShadow: '0 4px 12px rgba(26, 90, 82, 0.3)' }}
               onClick={() => onMoveToInterview?.(basicInfo.candidateId)}
             >

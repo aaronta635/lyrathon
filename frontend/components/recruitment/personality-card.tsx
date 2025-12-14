@@ -1,13 +1,8 @@
 "use client"
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-
-interface EngineerSummary {
-  inferred_seniority: string
-  core_strengths: string[]
-  working_style: string
-  collaboration_style: string
-}
+import { Briefcase, Star, Users } from "lucide-react"
+import type { EngineerSummary } from "@/lib/types"
 
 interface PersonalityCardProps {
   summary: EngineerSummary
@@ -15,35 +10,38 @@ interface PersonalityCardProps {
 
 export function PersonalityCard({ summary }: PersonalityCardProps) {
   const traits = [
-    { icon: "👔", label: "Seniority", value: summary.inferred_seniority, color: "bg-primary/10" },
-    { icon: "⭐", label: "Strengths", value: summary.core_strengths.join(", ") || "None identified", color: "bg-accent/10" },
-    { icon: "🎯", label: "Working Style", value: summary.working_style, color: "bg-secondary/10" },
-    { icon: "🤝", label: "Collaboration", value: summary.collaboration_style, color: "bg-warning/10" },
-  ]
+    { key: "seniority", label: "SENIORITY", value: summary.inferred_seniority },
+    { key: "strengths", label: "STRENGTHS", value: summary.core_strengths.join(", ") || "None identified" },
+    { key: "workingStyle", label: "WORKING STYLE", value: summary.working_style },
+    { key: "collaboration", label: "COLLABORATION", value: summary.collaboration_style },
+  ] as const
 
   return (
     <Card 
       className="h-full border-0 rounded-xl overflow-hidden"
-      style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.08)' }}
+      style={{ 
+        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+        borderLeft: '4px solid #4ECDC4'
+      }}
     >
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base font-semibold">
-          <span>🧠</span>
-          Personality
-        </CardTitle>
+      <CardHeader className="pb-2 pt-4 px-5">
+        <CardTitle className="text-base font-semibold">Personality</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {traits.map((trait, index) => (
-          <div key={index} className="flex items-start gap-3">
-            <div className={`w-10 h-10 rounded-xl ${trait.color} flex items-center justify-center text-lg shrink-0`}>
-              {trait.icon}
+      <CardContent className="space-y-3 px-5 pb-4">
+        {traits.map((trait, index) => {
+          const Icon = index === 0 ? Briefcase : index === 1 ? Star : Users
+          return (
+            <div key={trait.key} className="flex items-start gap-3 pb-2 border-b border-border last:border-b-0 last:pb-0">
+              <div className="w-8 h-8 rounded-full bg-accent/15 flex items-center justify-center text-accent">
+                <Icon className="h-4 w-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] text-muted-foreground uppercase tracking-wide mb-1">{trait.label}</p>
+                <p className="text-sm text-foreground font-medium">{trait.value}</p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">{trait.label}</p>
-              <p className="text-sm text-foreground font-medium capitalize truncate">{trait.value}</p>
-            </div>
-          </div>
-        ))}
+          )
+        })}
       </CardContent>
     </Card>
   )
