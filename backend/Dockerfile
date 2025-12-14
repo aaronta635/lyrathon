@@ -1,16 +1,19 @@
 FROM python:3.10
 WORKDIR /app
 
-# Copy requirements first for better caching
-COPY requirements.txt .
+# Copy requirements first for better caching (from backend directory)
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY . .
+# Copy application code (from backend directory)
+COPY backend/ .
+
+# Make start script executable
+RUN chmod +x start.sh
 
 # Expose port (Railway will set PORT env var)
-EXPOSE ${PORT:-8000}
+EXPOSE 8000
 
-# Run with production settings
-# Use PORT env var if available (Railway), otherwise default to 8000
-CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
+# Run with production settings using start script
+# The start script handles PORT env var substitution
+CMD ["./start.sh"]
